@@ -1,36 +1,50 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import {
+  SITE_URL,
+  SITE_NAME,
+  SITE_TITLE,
+  SITE_DESCRIPTION,
+  SITE_DESCRIPTION_SHORT,
+  TELEGRAM_APP_URL,
+  TELEGRAM_BOT_URL,
+  OG_IMAGE,
+  LOGO_IMAGE,
+} from "@/lib/site";
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#FF8C00",
+  themeColor: "#F5A524",
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://lokmago.uz"),
-  title: "LokmaGo — Sevimli restoran va kafelaringiz bir joyda",
-  description:
-    "Sizning sevimli restoran va kafelaringiz endi bir joyda. Mazali taomlarni tez va qulay buyurtma qiling. Ovqat yetkazib berish, restoran bron qilish, kafe va choyxonalar — barchasi LokmaGo'da.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: SITE_TITLE,
+    template: `%s — ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
   keywords: [
-    "LokmaGo",
-    "Lokma Go",
-    "ovqat buyurtma",
-    "restoran",
-    "kafe",
-    "choyxona",
-    "food delivery",
-    "Telegram Mini App",
-    "ovqat yetkazib berish",
-    "taom buyurtma",
-    "oziq-ovqat",
-    "Toshkent restoran",
-    "fast food",
-    "milliy taomlar",
+    // Brend
+    "LokmaGo", "Lokma Go", "lokma.uz",
+    // Asosiy xizmat
+    "ovqat yetkazib berish", "taom buyurtma", "yetkazib berish xizmati",
+    "restoran buyurtma", "onlayn ovqat buyurtma",
+    // Muassasa turlari
+    "restoran", "kafe", "choyxona", "fast food", "pitseriya",
+    // Taomlar
+    "osh", "shashlik", "lavash", "burger", "pitsa", "sushi",
+    "milliy taomlar", "sho'rva",
+    // Joylashuv
+    "Namangan restoran", "Toshkent restoran", "O'zbekiston yetkazib berish",
+    // Platforma
+    "Telegram Mini App", "stol bron qilish",
   ],
-  authors: [{ name: "LokmaGo Team" }],
-  creator: "LokmaGo",
-  publisher: "LokmaGo",
+  authors: [{ name: SITE_NAME, url: SITE_URL }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
   robots: {
     index: true,
     follow: true,
@@ -43,123 +57,122 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://lokmago.uz",
+    canonical: SITE_URL,
   },
   openGraph: {
     type: "website",
     locale: "uz_UZ",
-    url: "https://lokmago.uz",
-    siteName: "LokmaGo",
-    title: "🍔 LokmaGo — Sevimli restoranlaringiz bir joyda",
-    description:
-      "Sizning sevimli restoran va kafelaringiz endi bir joyda. Mazali taomlarni tez va qulay buyurtma qiling.",
+    alternateLocale: ["ru_RU"],
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION_SHORT,
     images: [
       {
-        url: "https://lokmago.uz/lokmago-preview.jpg",
+        url: OG_IMAGE,
         width: 1200,
         height: 630,
-        alt: "LokmaGo — Food Delivery & Restaurant Booking",
-        type: "image/jpeg",
+        alt: `${SITE_NAME} — ovqat yetkazib berish xizmati`,
+        type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "LokmaGo — Food Delivery",
-    description:
-      "Sizning sevimli restoran va kafelaringiz endi bir joyda. Mazali taomlarni tez va qulay buyurtma qiling.",
-    images: ["https://lokmago.uz/lokmago-preview.jpg"],
-    creator: "@lokmago",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION_SHORT,
+    images: [OG_IMAGE],
   },
+  // Qidiruv konsollari tasdiqlash kodlari.
+  // .env.local ga qo'shing, bo'sh bo'lsa meta teg chiqmaydi
+  // (noto'g'ri placeholder chiqishidan ko'ra yaxshiroq).
   verification: {
-    google: "google-site-verification-code",
-    yandex: "yandex-verification-code",
+    ...(process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION && {
+      google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION,
+    }),
+    ...(process.env.NEXT_PUBLIC_YANDEX_VERIFICATION && {
+      yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION,
+    }),
   },
   category: "food",
-  classification: "Food Delivery, Restaurant, Cafe",
   other: {
     "telegram:channel": "@lokmaGo",
     "apple-mobile-web-app-capable": "yes",
-    "apple-mobile-web-app-title": "LokmaGo",
-    "application-name": "LokmaGo",
-    "msapplication-TileColor": "#FF8C00",
-    "msapplication-config": "/browserconfig.xml",
+    "apple-mobile-web-app-title": SITE_NAME,
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
+    "application-name": SITE_NAME,
+    "msapplication-TileColor": "#F5A524",
   },
 };
 
+// Structured data — Google boy natijalar uchun
 const structuredData = {
   "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "WebSite",
-      "@id": "https://lokmago.uz/#website",
-      url: "https://lokmago.uz",
-      name: "LokmaGo",
-      description: "Sevimli restoran va kafelaringiz bir joyda. Ovqat yetkazib berish xizmati.",
-      publisher: { "@id": "https://lokmago.uz/#organization" },
+      "@id": `${SITE_URL}/#website`,
+      url: SITE_URL,
+      name: SITE_NAME,
+      description: SITE_DESCRIPTION,
+      publisher: { "@id": `${SITE_URL}/#organization` },
       inLanguage: "uz-UZ",
     },
     {
       "@type": "Organization",
-      "@id": "https://lokmago.uz/#organization",
-      name: "LokmaGo",
-      url: "https://lokmago.uz",
+      "@id": `${SITE_URL}/#organization`,
+      name: SITE_NAME,
+      url: SITE_URL,
       logo: {
         "@type": "ImageObject",
-        url: "https://lokmago.uz/logo.jpg",
+        url: LOGO_IMAGE,
         width: 512,
         height: 512,
       },
-      sameAs: ["https://t.me/lokmaGobot"],
+      sameAs: [TELEGRAM_BOT_URL],
     },
     {
       "@type": "FoodDeliveryService",
-      "@id": "https://lokmago.uz/#fooddelivery",
-      name: "LokmaGo Food Delivery",
-      url: "https://lokmago.uz",
-      areaServed: {
-        "@type": "City",
-        name: "Toshkent",
-        containedInPlace: {
-          "@type": "Country",
-          name: "O'zbekiston",
-        },
-      },
-      provider: { "@id": "https://lokmago.uz/#organization" },
+      "@id": `${SITE_URL}/#service`,
+      name: `${SITE_NAME} — ovqat yetkazib berish`,
+      url: SITE_URL,
+      image: OG_IMAGE,
+      description: SITE_DESCRIPTION,
+      provider: { "@id": `${SITE_URL}/#organization` },
       serviceType: "Food Delivery",
+      areaServed: [
+        { "@type": "City", name: "Namangan" },
+        { "@type": "City", name: "Toshkent" },
+      ],
       availableChannel: {
         "@type": "ServiceChannel",
-        serviceUrl: "https://t.me/lokmaGobot?startapp",
+        serviceUrl: TELEGRAM_APP_URL,
         serviceType: "Telegram Mini App",
+        availableLanguage: ["uz", "ru"],
+      },
+      hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        name: "Taom turlari",
+        itemListElement: [
+          "Milliy taomlar", "Fast food", "Pitsa",
+          "Sushi", "Shashlik", "Shirinliklar",
+        ].map((name) => ({
+          "@type": "OfferCatalog",
+          name,
+        })),
       },
     },
     {
       "@type": "MobileApplication",
-      name: "LokmaGo",
-      applicationCategory: "FoodDelivery",
-      operatingSystem: "Any",
+      "@id": `${SITE_URL}/#app`,
+      name: SITE_NAME,
+      applicationCategory: "FoodAndDrinkApplication",
+      operatingSystem: "Android, iOS, Web",
+      url: TELEGRAM_APP_URL,
       offers: {
         "@type": "Offer",
         price: "0",
         priceCurrency: "UZS",
-      },
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: "4.9",
-        ratingCount: "1250",
-      },
-    },
-    {
-      "@type": "Restaurant",
-      name: "LokmaGo Partner Restaurants",
-      url: "https://lokmago.uz",
-      image: "https://lokmago.uz/lokmago-preview.jpg",
-      servesCuisine: ["O'zbek milliy taomlari", "Fast Food", "Evropa taomlari", "Osiyo taomlari"],
-      priceRange: "$$",
-      address: {
-        "@type": "PostalAddress",
-        addressCountry: "UZ",
-        addressLocality: "Toshkent",
       },
     },
   ],
@@ -167,20 +180,20 @@ const structuredData = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="uz">
       <head>
-        <link rel="icon" href="/logo.jpg" type="image/jpeg" />
-        <link rel="apple-touch-icon" href="/logo.jpg" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/logo.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
+        {/* Telegram serveriga oldindan ulanish — yo'naltirish tezroq */}
+        <link rel="preconnect" href="https://t.me" />
+        <link rel="dns-prefetch" href="https://t.me" />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(structuredData),
-          }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
       </head>
       <body className="antialiased">{children}</body>

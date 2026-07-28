@@ -1,7 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /api/
-
-Sitemap: https://lokmago.uz/sitemap.xml
-
-Host: https://lokmago.uz

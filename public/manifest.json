@@ -1,21 +1,32 @@
 {
-  "name": "LokmaGo",
+  "name": "LokmaGo — ovqat yetkazib berish",
   "short_name": "LokmaGo",
-  "description": "Sevimli restoran va kafelaringiz bir joyda. Ovqat yetkazib berish xizmati.",
+  "description": "Restoran va kafelardan taom buyurtma qiling. Tez yetkazish, stol bron qilish.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0D0D0D",
-  "theme_color": "#FF8C00",
+  "orientation": "portrait",
+  "background_color": "#12100E",
+  "theme_color": "#F5A524",
+  "lang": "uz",
+  "categories": ["food", "shopping"],
   "icons": [
     {
-      "src": "/logo.jpg",
+      "src": "/logo-192.png",
       "sizes": "192x192",
-      "type": "image/jpeg"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/logo.jpg",
+      "src": "/logo.png",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
