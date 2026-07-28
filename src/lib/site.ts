@@ -7,7 +7,7 @@
 export const SITE_URL = "https://lokma.uz";
 
 // Telegram bot username (@ belgisisiz)
-export const BOT_USERNAME = "lakmagobot";
+export const BOT_USERNAME = "lokmaGobot";
 
 // Mini App havolasi — bosilganda ilova ochiladi
 export const TELEGRAM_APP_URL = `https://t.me/${BOT_USERNAME}?startapp`;
