@@ -7,7 +7,7 @@ import { TELEGRAM_APP_URL, SITE_NAME } from "@/lib/site";
 
 // Window.Telegram turi src/types/telegram.d.ts da e'lon qilingan
 
-const REDIRECT_DELAY = 1200;
+const REDIRECT_DELAY = 5000; // 5 soniya
 
 export default function Home() {
   const [isRedirecting, setIsRedirecting] = useState(false);
