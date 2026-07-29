@@ -78,7 +78,7 @@ export default function Splash({ isRedirecting }: SplashProps) {
           >
             <div className="relative w-64 h-80 sm:w-72 sm:h-96 glow-orange rounded-2xl overflow-hidden">
               <Image
-                src="/lokmago-preview.jpg"
+                src="/lokma.png"
                 alt="LokmaGo Logo"
                 fill
                 priority
