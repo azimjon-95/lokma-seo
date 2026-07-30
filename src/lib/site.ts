@@ -16,21 +16,25 @@ export const TELEGRAM_APP_URL = `https://t.me/${BOT_USERNAME}?startapp`;
 export const TELEGRAM_BOT_URL = `https://t.me/${BOT_USERNAME}`;
 
 // Rasm yo'llari
-export const OG_IMAGE = `${SITE_URL}/og-image.png`;
+export const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
 export const LOGO_IMAGE = `${SITE_URL}/logo.png`;
 
 // Sayt nomi va tavsiflar
 export const SITE_NAME = "LokmaGo";
 
+// Sarlavhada brend nomining barcha yozilishi bor:
+// "Lokma", "LokmaGo", "lokma.uz" — qaysi biri qidirilsa ham topiladi
 export const SITE_TITLE =
-  "LokmaGo — Restoran va kafelardan ovqat yetkazib berish";
+  "Lokma — LokmaGo | Ovqat yetkazib berish xizmati | lokma.uz";
 
 export const SITE_DESCRIPTION =
-  "Namangan va Toshkentdagi eng yaxshi restoran, kafe va choyxonalardan " +
-  "taom buyurtma qiling. Tez yetkazib berish, stol bron qilish, " +
-  "o'zingiz olib ketish imkoniyati. Telegram orqali bir necha bosishda.";
+  "Lokma (LokmaGo) — Namangan va Toshkentdagi restoran, kafe va " +
+  "choyxonalardan ovqat yetkazib berish xizmati. Osh, shashlik, lavash, " +
+  "burger, pitsa va boshqa taomlarni 25-40 daqiqada yetkazib beramiz. " +
+  "Stol bron qilish, o'zingiz olib ketish, naqd va karta orqali to'lov. " +
+  "lokma.uz saytida yoki Telegram ilovasida buyurtma bering.";
 
 // Qisqa tavsif (Twitter, OG uchun)
 export const SITE_DESCRIPTION_SHORT =
-  "Sevimli restoranlaringizdan taom buyurtma qiling. " +
-  "Tez yetkazish, stol bron qilish — Telegram'da.";
+  "Namangan va Toshkentdagi restoran va kafelardan ovqat yetkazib berish. " +
+  "Osh, shashlik, lavash, pitsa — 25-40 daqiqada eshigingizgacha.";

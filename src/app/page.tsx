@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Splash from "@/components/Splash";
 import RedirectButton from "@/components/RedirectButton";
-import { TELEGRAM_APP_URL, SITE_NAME } from "@/lib/site";
+import { TELEGRAM_APP_URL, BOT_USERNAME } from "@/lib/site";
 
 // Window.Telegram turi src/types/telegram.d.ts da e'lon qilingan
 
@@ -61,48 +61,98 @@ export default function Home() {
 
       {/* Qidiruv tizimlari uchun kontent — ekranda ko'rinmaydi */}
       <div className="sr-only">
-        <h1>{SITE_NAME} — restoran va kafelardan ovqat yetkazib berish</h1>
+        <h1>
+          Lokma (LokmaGo) — Namangan va Toshkentda ovqat yetkazib berish
+        </h1>
 
         <p>
-          Namangan va Toshkentdagi eng yaxshi restoran, kafe va choyxonalardan
-          taom buyurtma qiling. Buyurtmangiz 25–40 daqiqada yetkaziladi,
-          ko&apos;p restoranlarda yetkazish bepul.
+          <strong>Lokma</strong> — bu <strong>LokmaGo</strong> ovqat yetkazib
+          berish xizmati. Sayt manzili: <strong>lokma.uz</strong>. Namangan va
+          Toshkent shahridagi eng yaxshi restoran, kafe va choyxonalardan taom
+          buyurtma qiling. Buyurtmangiz 25–40 daqiqada yetkaziladi.
         </p>
 
-        <h2>Qanday ishlaydi</h2>
+        <h2>Lokma nima?</h2>
+        <p>
+          Lokma (LokmaGo) — O&apos;zbekistondagi onlayn ovqat buyurtma
+          platformasi. Telegram ilovasi orqali ishlaydi: alohida dastur
+          o&apos;rnatish shart emas. Restoranlar menyusini ko&apos;rasiz,
+          taom tanlaysiz, manzil kiritasiz — kuryer olib keladi.
+        </p>
+
+        <h2>Qanday buyurtma beriladi</h2>
         <ol>
-          <li>Telegram orqali ilovani oching</li>
+          <li>lokma.uz saytiga kiring yoki Telegram&apos;da botni oching</li>
           <li>Restoran va taomlarni tanlang</li>
-          <li>Manzil kiriting yoki o&apos;zingiz olib ketishni tanlang</li>
+          <li>Manzilni kiriting yoki o&apos;zingiz olib ketishni belgilang</li>
+          <li>To&apos;lov usulini tanlang — naqd yoki karta</li>
           <li>Buyurtmani real vaqtda kuzatib boring</li>
         </ol>
 
-        <h2>Imkoniyatlar</h2>
+        <h2>Xizmat imkoniyatlari</h2>
         <ul>
-          <li>Ovqat yetkazib berish — kuryer eshigingizgacha</li>
-          <li>O&apos;zingiz olib ketish — yetkazish haqisiz</li>
-          <li>Stol bron qilish — restoranda joy oldindan band qilinadi</li>
-          <li>Belgilangan vaqtga buyurtma — kerakli soatga tayyorlanadi</li>
-          <li>Naqd yoki karta orqali to&apos;lov</li>
-          <li>Do&apos;stlarni taklif qilib bonus olish</li>
+          <li>
+            <strong>Yetkazib berish</strong> — kuryer eshigingizgacha olib
+            keladi, ko&apos;p restoranlarda bepul
+          </li>
+          <li>
+            <strong>O&apos;zim olib ketaman</strong> — yetkazish haqi
+            olinmaydi, taom tayyor bo&apos;lganda borasiz
+          </li>
+          <li>
+            <strong>Stol bron qilish</strong> — restoranda joyni oldindan
+            band qiling, kelishingizga tayyor bo&apos;ladi
+          </li>
+          <li>
+            <strong>Belgilangan vaqtga</strong> — kerakli soatga buyurtma
+            bering, o&apos;shanda tayyorlanadi
+          </li>
+          <li>
+            <strong>Bonus tizimi</strong> — do&apos;stlarni taklif qiling,
+            ikkalangiz bonus olasiz
+          </li>
         </ul>
 
-        <h2>Taom turlari</h2>
+        <h2>Qanday taomlar bor</h2>
         <p>
-          Milliy taomlar (osh, shashlik, lag&apos;mon, manti, sho&apos;rva),
-          fast food (lavash, burger, hot-dog), pitsa, sushi va rollar,
-          nonushta taomlari, shirinliklar, ichimliklar.
+          Milliy taomlar: osh (palov), shashlik, lag&apos;mon, manti, somsa,
+          sho&apos;rva, norin. Fast food: lavash, shaurma, burger, hot-dog,
+          kartoshka fri. Xorijiy oshxona: pitsa, sushi va rollar, yevropa
+          taomlari, turk taomlari. Shirinliklar: tort, chizkeyk, muzqaymoq.
+          Ichimliklar: qahva, choy, sharbat, salqin ichimliklar.
         </p>
 
-        <h2>Xizmat ko&apos;rsatiladigan hududlar</h2>
+        <h2>Qayerda ishlaydi</h2>
         <p>
-          Namangan shahri, Toshkent shahri va atrofdagi tumanlar.
-          Restoranlar ro&apos;yxati doimiy kengayib bormoqda.
+          Hozircha Namangan shahri va Toshkent shahrida xizmat
+          ko&apos;rsatamiz. Restoranlar ro&apos;yxati doimiy kengaymoqda —
+          yangi muassasalar har hafta qo&apos;shilib bormoqda.
+        </p>
+
+        <h2>To&apos;lov usullari</h2>
+        <p>
+          Naqd pul (kuryerga yetkazilganda) yoki plastik karta orqali:
+          UzCard, Humo, Visa, Mastercard. Karta ma&apos;lumotlari xavfsiz
+          saqlanadi — to&apos;liq raqam bazada saqlanmaydi.
+        </p>
+
+        <h2>Restoranlar uchun</h2>
+        <p>
+          Restoran, kafe, choyxona yoki oziq-ovqat do&apos;koni egasimisiz?
+          Lokma platformasiga qo&apos;shiling — yangi mijozlar oling.
+          Menyu, buyurtmalar va bronlarni boshqarish uchun alohida panel
+          beriladi.
+        </p>
+
+        <h2>Aloqa</h2>
+        <p>
+          Sayt: lokma.uz · Telegram: @{BOT_USERNAME} · Ilovadagi
+          qo&apos;llab-quvvatlash chati orqali istalgan vaqt yozing.
         </p>
 
         <nav>
           <a href={TELEGRAM_APP_URL}>
-            {SITE_NAME} ilovasini Telegram orqali ochish
+            LokmaGo ilovasini Telegram orqali ochish
           </a>
         </nav>
       </div>

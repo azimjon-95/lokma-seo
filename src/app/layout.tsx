@@ -73,7 +73,7 @@ export const metadata: Metadata = {
         width: 1200,
         height: 630,
         alt: `${SITE_NAME} — ovqat yetkazib berish xizmati`,
-        type: "image/png",
+        type: "image/jpeg",
       },
     ],
   },
@@ -96,7 +96,10 @@ export const metadata: Metadata = {
   },
   category: "food",
   other: {
+    // Telegram havola ko'rinishi uchun (og: teglarni to'ldiradi)
     "telegram:channel": "@lokmaGo",
+    // Ba'zi mijozlar shu teglarni o'qiydi
+    "og:image:secure_url": OG_IMAGE,
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-title": SITE_NAME,
     "apple-mobile-web-app-status-bar-style": "black-translucent",
@@ -114,6 +117,8 @@ const structuredData = {
       "@id": `${SITE_URL}/#website`,
       url: SITE_URL,
       name: SITE_NAME,
+      // Brendning boshqa yozilishlari — qidiruvda tanilishi uchun
+      alternateName: ["Lokma", "Lokma Go", "lokma.uz", "Локма", "ЛокмаГо"],
       description: SITE_DESCRIPTION,
       publisher: { "@id": `${SITE_URL}/#organization` },
       inLanguage: "uz-UZ",
@@ -122,7 +127,9 @@ const structuredData = {
       "@type": "Organization",
       "@id": `${SITE_URL}/#organization`,
       name: SITE_NAME,
+      alternateName: ["Lokma", "lokma.uz"],
       url: SITE_URL,
+      description: SITE_DESCRIPTION,
       logo: {
         "@type": "ImageObject",
         url: LOGO_IMAGE,
@@ -161,6 +168,63 @@ const structuredData = {
           name,
         })),
       },
+    },
+    {
+      "@type": "FAQPage",
+      "@id": `${SITE_URL}/#faq`,
+      mainEntity: [
+        {
+          "@type": "Question",
+          name: "Lokma nima?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text:
+              "Lokma (LokmaGo) — Namangan va Toshkentdagi restoran, kafe va " +
+              "choyxonalardan ovqat yetkazib berish xizmati. Telegram ilovasi " +
+              "orqali ishlaydi, alohida dastur o'rnatish shart emas.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Buyurtma qancha vaqtda yetkaziladi?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text:
+              "Odatda 25-40 daqiqa. Aniq vaqt restoran va manzilga bog'liq — " +
+              "buyurtma berishdan oldin ko'rsatiladi.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Yetkazib berish pullikmi?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text:
+              "Ko'p restoranlarda bepul. Ba'zilarida 5000-15000 so'm. " +
+              "O'zingiz olib ketsangiz yetkazish haqi umuman olinmaydi.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Qanday to'lash mumkin?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text:
+              "Naqd pul (kuryerga) yoki plastik karta orqali: UzCard, Humo, " +
+              "Visa, Mastercard.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Stol bron qilsa bo'ladimi?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text:
+              "Ha. Restoran sahifasida 'Stol bron qilish' tugmasi bor. " +
+              "Sana, vaqt va mehmonlar sonini tanlaysiz, restoran tasdiqlaydi.",
+          },
+        },
+      ],
     },
     {
       "@type": "MobileApplication",
