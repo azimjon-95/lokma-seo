@@ -13,7 +13,11 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  trailingSlash: true,
+  // trailingSlash: true OLIB TASHLANDI.
+  // U bilan lokma.uz → lokma.uz/ ga 308 yo'naltirish bo'lardi.
+  // Telegram va ba'zi ijtimoiy tarmoq botlari yo'naltirishni
+  // kuzatmaydi — havola yalang'och URL bo'lib ketardi, karta
+  // ko'rinmasdi.
 
   // Xavfsizlik sarlavhalari
   async headers() {

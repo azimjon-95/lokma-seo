@@ -4,7 +4,7 @@
  */
 
 // Ishlab chiqarish domeni (https, oxirida slash yo'q)
-export const SITE_URL = "https://lokma.uz";
+export const SITE_URL = "https://lokma.uz";  // oxirida slash YO'Q
 
 // Telegram bot username (@ belgisisiz)
 export const BOT_USERNAME = "lokmaGobot";
