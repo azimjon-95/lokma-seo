@@ -62,94 +62,109 @@ export default function Home() {
       {/* Qidiruv tizimlari uchun kontent — ekranda ko'rinmaydi */}
       <div className="sr-only">
         <h1>
-          Lokma (LokmaGo) — Namangan va Toshkentda ovqat yetkazib berish
+          Lokma (LokmaGo) — Namangan va Popda ovqat yetkazib berish
         </h1>
-
+      
         <p>
           <strong>Lokma</strong> — bu <strong>LokmaGo</strong> ovqat yetkazib
-          berish xizmati. Sayt manzili: <strong>lokma.uz</strong>. Namangan va
-          Toshkent shahridagi eng yaxshi restoran, kafe va choyxonalardan taom
-          buyurtma qiling. Buyurtmangiz 25–40 daqiqada yetkaziladi.
+          berish xizmati. Sayt manzili: <strong>lokma.uz</strong>. Namangan shahri
+          va Pop tumanidagi restoran, kafe va choyxonalardan taom buyurtma qiling.
+          Buyurtmangizni qulay tarzda yetkazib berish yoki o'zingiz olib ketish
+          xizmatidan foydalaning.
         </p>
-
+      
         <h2>Lokma nima?</h2>
         <p>
-          Lokma (LokmaGo) — O&apos;zbekistondagi onlayn ovqat buyurtma
-          platformasi. Telegram ilovasi orqali ishlaydi: alohida dastur
-          o&apos;rnatish shart emas. Restoranlar menyusini ko&apos;rasiz,
-          taom tanlaysiz, manzil kiritasiz — kuryer olib keladi.
+          Lokma (LokmaGo) — O'zbekistonda ovqat buyurtma qilish platformasi.
+          Telegram ilovasi orqali ishlaydi: alohida dastur o'rnatish shart emas.
+          Namangan va Popdagi restoranlar menyusini ko'rasiz, taom tanlaysiz,
+          manzil kiritasiz va buyurtmangizni kuzatib borasiz.
         </p>
-
-        <h2>Qanday buyurtma beriladi</h2>
+      
+        <h2>Namanganda ovqat buyurtma qilish</h2>
+        <p>
+          Namangan shahrida Lokma orqali restoran, kafe va choyxonalardan turli
+          xil taomlarga buyurtma berishingiz mumkin. Milliy taomlar, fast food,
+          pitsa, sushi, shirinliklar va ichimliklarni tanlang va buyurtmangizni
+          qulay tarzda qabul qiling.
+        </p>
+      
+        <h2>Popda ovqat buyurtma qilish</h2>
+        <p>
+          Pop tumanida ham Lokma orqali ovqat buyurtma qilish imkoniyati mavjud.
+          Popdagi restoran va ovqatlanish joylaridan menyuni ko'rib, kerakli
+          taomlarni tanlang va mavjud yetkazib berish xizmatidan foydalaning.
+        </p>
+      
+        <h2>Qanday buyurtma beriladi?</h2>
         <ol>
-          <li>lokma.uz saytiga kiring yoki Telegram&apos;da botni oching</li>
-          <li>Restoran va taomlarni tanlang</li>
-          <li>Manzilni kiriting yoki o&apos;zingiz olib ketishni belgilang</li>
-          <li>To&apos;lov usulini tanlang — naqd yoki karta</li>
-          <li>Buyurtmani real vaqtda kuzatib boring</li>
+          <li>lokma.uz saytiga kiring yoki Telegram'da LokmaGo botini oching</li>
+          <li>Namangan yoki Popdagi restoran va taomlarni tanlang</li>
+          <li>Yetkazib berish manzilini kiriting yoki o'zingiz olib ketishni belgilang</li>
+          <li>To'lov usulini tanlang — naqd yoki karta</li>
+          <li>Buyurtma holatini kuzatib boring</li>
         </ol>
-
-        <h2>Xizmat imkoniyatlari</h2>
+      
+        <h2>Lokma xizmatlari</h2>
         <ul>
           <li>
-            <strong>Yetkazib berish</strong> — kuryer eshigingizgacha olib
-            keladi, ko&apos;p restoranlarda bepul
+            <strong>Yetkazib berish</strong> — buyurtmangizni kuryer ko'rsatilgan
+            manzilga olib boradi
           </li>
           <li>
-            <strong>O&apos;zim olib ketaman</strong> — yetkazish haqi
-            olinmaydi, taom tayyor bo&apos;lganda borasiz
+            <strong>O'zim olib ketaman</strong> — buyurtmani restoran tayyorlagach,
+            o'zingiz borib olib ketishingiz mumkin
           </li>
           <li>
-            <strong>Stol bron qilish</strong> — restoranda joyni oldindan
-            band qiling, kelishingizga tayyor bo&apos;ladi
+            <strong>Stol bron qilish</strong> — restoranda joyni oldindan band qiling
           </li>
           <li>
-            <strong>Belgilangan vaqtga</strong> — kerakli soatga buyurtma
-            bering, o&apos;shanda tayyorlanadi
+            <strong>Belgilangan vaqtga buyurtma</strong> — taomni kerakli vaqtga
+            oldindan buyurtma qiling
           </li>
           <li>
-            <strong>Bonus tizimi</strong> — do&apos;stlarni taklif qiling,
-            ikkalangiz bonus olasiz
+            <strong>Bonus tizimi</strong> — do'stlaringizni taklif qiling va
+            bonuslardan foydalaning
           </li>
         </ul>
-
-        <h2>Qanday taomlar bor</h2>
+      
+        <h2>Lokmada qanday taomlar bor?</h2>
         <p>
-          Milliy taomlar: osh (palov), shashlik, lag&apos;mon, manti, somsa,
-          sho&apos;rva, norin. Fast food: lavash, shaurma, burger, hot-dog,
-          kartoshka fri. Xorijiy oshxona: pitsa, sushi va rollar, yevropa
-          taomlari, turk taomlari. Shirinliklar: tort, chizkeyk, muzqaymoq.
-          Ichimliklar: qahva, choy, sharbat, salqin ichimliklar.
+          Milliy taomlar: osh (palov), shashlik, lag'mon, manti, somsa, sho'rva,
+          norin. Fast food: lavash, shaurma, burger, hot-dog, kartoshka fri.
+          Xorijiy oshxonalar: pitsa, sushi va rollar, yevropa taomlari,
+          turk taomlari. Shirinliklar: tort, chizkeyk, muzqaymoq.
+          Ichimliklar: qahva, choy, sharbat va salqin ichimliklar.
         </p>
-
-        <h2>Qayerda ishlaydi</h2>
+      
+        <h2>Lokma qayerda ishlaydi?</h2>
         <p>
-          Hozircha Namangan shahri va Toshkent shahrida xizmat
-          ko&apos;rsatamiz. Restoranlar ro&apos;yxati doimiy kengaymoqda —
-          yangi muassasalar har hafta qo&apos;shilib bormoqda.
+          Lokma hozirda Namangan shahri va Pop tumanida xizmat ko'rsatishga
+          yo'naltirilgan. Platformaga yangi restoran, kafe, choyxona va boshqa
+          ovqatlanish joylari muntazam qo'shib boriladi.
         </p>
-
-        <h2>To&apos;lov usullari</h2>
+      
+        <h2>To'lov usullari</h2>
         <p>
-          Naqd pul (kuryerga yetkazilganda) yoki plastik karta orqali:
-          UzCard, Humo, Visa, Mastercard. Karta ma&apos;lumotlari xavfsiz
-          saqlanadi — to&apos;liq raqam bazada saqlanmaydi.
+          Buyurtma uchun naqd pul yoki plastik karta orqali to'lash mumkin.
+          UzCard, Humo, Visa va Mastercard kabi to'lov usullaridan foydalanish
+          imkoniyati mavjud.
         </p>
-
-        <h2>Restoranlar uchun</h2>
+      
+        <h2>Restoranlar uchun Lokma</h2>
         <p>
-          Restoran, kafe, choyxona yoki oziq-ovqat do&apos;koni egasimisiz?
-          Lokma platformasiga qo&apos;shiling — yangi mijozlar oling.
-          Menyu, buyurtmalar va bronlarni boshqarish uchun alohida panel
-          beriladi.
+          Namangan yoki Popda restoran, kafe, choyxona yoki oziq-ovqat do'koni
+          egasimisiz? Lokma platformasiga qo'shiling va yangi mijozlarga
+          chiqish imkoniyatiga ega bo'ling. Menyu, buyurtmalar va bronlarni
+          boshqarish uchun qulay panel taqdim etiladi.
         </p>
-
+      
         <h2>Aloqa</h2>
         <p>
-          Sayt: lokma.uz · Telegram: @{BOT_USERNAME} · Ilovadagi
-          qo&apos;llab-quvvatlash chati orqali istalgan vaqt yozing.
+          Sayt: lokma.uz · Telegram: @{BOT_USERNAME} · LokmaGo ilovasidagi
+          qo'llab-quvvatlash chati orqali biz bilan bog'lanishingiz mumkin.
         </p>
-
+      
         <nav>
           <a href={TELEGRAM_APP_URL}>
             LokmaGo ilovasini Telegram orqali ochish
