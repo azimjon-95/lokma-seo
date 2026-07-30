@@ -86,27 +86,27 @@ export default function Splash({ isRedirecting, onComplete }: SplashProps) {
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.5 }}
         >
-          {/* Main Card / Banner Area */}
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{
-              type: "spring",
-              stiffness: 180,
-              damping: 15,
-              delay: 0.1,
-            }}
-            className="mb-6 relative w-64 h-80 sm:w-72 sm:h-96 rounded-2xl overflow-hidden border border-lokma-orange/30 shadow-[0_0_30px_rgba(255,122,0,0.2)]"
-          >
-            <Image
-              src="/banner.png"
-              alt="LokmaGo Banner"
-              fill
-              priority
-              className="object-cover"
-              sizes="(max-width: 640px) 256px, 288px"
-            />
-          </motion.div>
+        {/* Main Card / Banner Area */}
+<motion.div
+  initial={{ scale: 0.8, opacity: 0 }}
+  animate={{ scale: 1, opacity: 1 }}
+  transition={{
+    type: "spring",
+    stiffness: 180,
+    damping: 15,
+    delay: 0.1,
+  }}
+  className="mb-6 relative w-[271px] h-[335px] sm:w-[303px] sm:h-[399px] rounded-[24px] overflow-hidden border border-lokma-orange/30 shadow-[0_0_30px_rgba(255,122,0,0.2)]"
+>
+  <Image
+    src="/banner.png"
+    alt="LokmaGo Banner"
+    fill
+    priority
+    className="object-cover"
+    sizes="(max-width: 640px) 271px, 303px"
+  />
+</motion.div>
 
           {/* Title */}
           <motion.h1
