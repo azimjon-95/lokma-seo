@@ -567,127 +567,307 @@ body {
 }
 
 /* ═══ Ofitsiant paneli ═══ */
-.wt-login {
-  width: 100%; max-width: 320px;
-  text-align: center;
-}
-.wt-login__logo { font-size: 46px; margin-bottom: 12px; }
-.wt-login__title {
-  font-size: 21px; font-weight: 700;
-  margin: 0 0 4px;
-  letter-spacing: -0.3px;
-}
-.wt-login__sub {
-  font-size: 13.5px; color: var(--di-muted);
-  margin: 0 0 24px;
-}
-.wt-login__note {
-  font-size: 12px; color: var(--di-muted);
-  opacity: 0.7;
-  line-height: 1.5;
-  margin-top: 18px;
+.wt-page{
+ min-height:100dvh;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ padding:20px;
+ background:
+ radial-gradient(
+ circle at top,
+ rgba(245,165,36,.25),
+ transparent 40%
+ ),
+ #090909;
 }
 
-.wt-input {
-  width: 100%;
-  padding: 14px 16px;
-  background: var(--di-surface);
-  border: 1px solid var(--di-line);
-  border-radius: 14px;
-  color: var(--di-ink);
-  font-size: 15px;
-  margin-bottom: 10px;
-  font-family: inherit;
-}
-.wt-input::placeholder { color: var(--di-muted); }
-.wt-input:focus {
-  outline: none;
-  border-color: var(--di-brand);
+
+.wt-card{
+
+ width:100%;
+ max-width:390px;
+
+ padding:32px 24px;
+
+ border-radius:30px;
+
+ background:
+ rgba(255,255,255,.06);
+
+ backdrop-filter:blur(20px);
+
+ border:1px solid rgba(255,255,255,.1);
+
+ box-shadow:
+ 0 25px 70px rgba(0,0,0,.45);
+
 }
 
-.wt-logout {
-  padding: 8px 14px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.07);
-  color: var(--di-muted);
-  font-size: 13px;
-  flex: none;
+
+
+.wt-logo{
+ text-align:center;
+ margin-bottom:30px;
 }
 
-.wt-earnings {
-  display: flex; align-items: baseline; gap: 10px;
-  margin: 12px 16px 0;
-  padding: 14px 16px;
-  background: rgba(245, 165, 36, 0.1);
-  border: 1px solid rgba(245, 165, 36, 0.25);
-  border-radius: 16px;
-  font-size: 13.5px;
-  color: var(--di-muted);
-}
-.wt-earnings b {
-  font-size: 18px; color: var(--di-brand);
-  font-variant-numeric: tabular-nums;
-}
-.wt-earnings__sub { margin-left: auto; font-size: 12px; }
 
-.wt-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
-  gap: 10px;
-}
-.wt-table {
-  aspect-ratio: 1;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 3px;
-  background: var(--di-surface);
-  border: 1.5px solid var(--di-line);
-  border-radius: 18px;
-  color: var(--di-ink);
-  padding: 10px;
-  transition: transform 0.14s;
-}
-.wt-table:active { transform: scale(0.96); }
-.wt-table.is-busy {
-  border-color: var(--di-brand);
-  background: rgba(245, 165, 36, 0.08);
-}
-.wt-table__num {
-  font-size: 26px; font-weight: 700;
-  letter-spacing: -0.5px;
-}
-.wt-table__name {
-  font-size: 11px; color: var(--di-muted);
-  text-align: center;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  max-width: 100%;
-}
-.wt-table__status {
-  font-size: 11px; color: var(--di-muted);
-}
-.wt-table__orders {
-  font-size: 10.5px; color: var(--di-brand);
-  font-weight: 600;
-  margin-top: 2px;
+.wt-logo-icon{
+
+ width:70px;
+ height:70px;
+
+ margin:auto;
+
+ display:flex;
+ align-items:center;
+ justify-content:center;
+
+ border-radius:22px;
+
+ background:
+ linear-gradient(
+ 135deg,
+ #f5a524,
+ #ff7a00
+ );
+
+ color:white;
+
+ box-shadow:
+ 0 10px 30px rgba(245,165,36,.35);
+
 }
 
-.wt-selected {
-  margin: 12px 16px 0;
-  padding: 12px 14px;
-  background: var(--di-surface);
-  border: 0.5px solid var(--di-line);
-  border-radius: 16px;
-}
-.wt-selected__row {
-  display: flex; align-items: center; gap: 10px;
-  padding: 6px 0;
-}
-.wt-selected__name {
-  flex: 1; min-width: 0;
-  font-size: 14px;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+
+
+.wt-logo h1{
+
+ margin:14px 0 2px;
+
+ font-size:28px;
+
+ font-weight:800;
+
+ letter-spacing:-1px;
+
 }
 
+
+.wt-logo span{
+
+ color:#f5a524;
+
+ font-size:14px;
+
+}
+
+
+
+.wt-header{
+
+ text-align:center;
+
+ margin-bottom:25px;
+
+}
+
+
+.wt-header h2{
+
+ font-size:22px;
+
+ margin:0;
+
+}
+
+
+.wt-header p{
+
+ color:#999;
+
+ font-size:14px;
+
+}
+
+
+
+.wt-form input{
+
+ width:100%;
+
+ height:54px;
+
+ padding:0 16px;
+
+ border-radius:16px;
+
+ border:
+
+ 1px solid rgba(255,255,255,.12);
+
+ background:#151515;
+
+ color:white;
+
+ font-size:16px;
+
+ margin-bottom:12px;
+
+}
+
+
+
+.wt-password{
+
+ position:relative;
+
+}
+
+
+.wt-password input{
+
+ padding-right:50px;
+
+}
+
+
+
+.wt-password button{
+
+ position:absolute;
+
+ right:15px;
+
+ top:15px;
+
+ background:none;
+
+ color:#aaa;
+
+}
+
+
+
+.wt-submit{
+
+ width:100%;
+
+ height:56px;
+
+ border-radius:18px;
+
+ background:#f5a524;
+
+ color:#111;
+
+ font-weight:700;
+
+ font-size:16px;
+
+ margin-top:8px;
+
+}
+
+
+
+.wt-submit:disabled{
+
+ opacity:.6;
+
+}
+
+
+
+.wt-error{
+
+ background:#ff444422;
+
+ border:1px solid #ff444455;
+
+ padding:12px;
+
+ border-radius:14px;
+
+ color:#ff7777;
+
+ font-size:14px;
+
+ margin-bottom:10px;
+
+}
+
+
+
+.wt-device{
+
+ display:flex;
+
+ gap:12px;
+
+ margin-top:24px;
+
+ padding:16px;
+
+ border-radius:18px;
+
+ background:rgba(255,255,255,.04);
+
+ border:1px solid rgba(255,255,255,.08);
+
+}
+
+
+
+.wt-device-icon{
+
+ font-size:24px;
+
+}
+
+
+
+.wt-device b{
+
+ font-size:14px;
+
+}
+
+
+
+.wt-device p{
+
+ margin:5px 0 0;
+
+ color:#999;
+
+ font-size:12px;
+
+ line-height:1.5;
+
+}
+
+
+
+@media(max-width:380px){
+
+ .wt-card{
+
+  padding:24px 18px;
+
+  border-radius:24px;
+
+ }
+
+
+ .wt-logo h1{
+
+  font-size:24px;
+
+ }
+
+
+}
 /* ─── Chaqiruv tugmalari ─── */
 .di-actions {
   display: flex; gap: 10px;
