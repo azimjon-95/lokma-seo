@@ -115,6 +115,20 @@ export function MyOrders({ token }: { token: string }) {
                     ))}
                   </div>
 
+                  {(o.promotionDiscount ?? 0) > 0 && (
+                    <div className="di-order__fee di-order__fee--discount">
+                      <span>{o.promotionName || 'Aksiya'}</span>
+                      <span>−{som(o.promotionDiscount)}</span>
+                    </div>
+                  )}
+
+                  {(o.bonusUsed ?? 0) > 0 && (
+                    <div className="di-order__fee di-order__fee--discount">
+                      <span>Bonus</span>
+                      <span>−{som(o.bonusUsed)}</span>
+                    </div>
+                  )}
+
                   {o.serviceFee > 0 && (
                     <div className="di-order__fee">
                       <span>Xizmat haqi</span>

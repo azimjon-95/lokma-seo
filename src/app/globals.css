@@ -778,3 +778,15 @@ body {
   font-size: 13px; font-weight: 620;
   flex: none;
 }
+
+.di-hint {
+  font-size: 12px;
+  color: var(--di-muted);
+  background: var(--di-surface-2);
+  border-radius: 11px;
+  padding: 10px 13px;
+  margin-top: 12px;
+  line-height: 1.45;
+}
+
+.di-order__fee--discount { color: var(--di-success); }

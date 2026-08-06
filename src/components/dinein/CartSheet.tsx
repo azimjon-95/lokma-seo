@@ -98,6 +98,12 @@ export function CartSheet({
           )}
 
           {cart.items.length > 0 && (
+            <div className="di-hint">
+              Chegirma va xizmat haqi buyurtma berilganda hisoblanadi
+            </div>
+          )}
+
+          {cart.items.length > 0 && (
             <textarea
               value={note}
               onChange={(e) => setNote(e.target.value)}

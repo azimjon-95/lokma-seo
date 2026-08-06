@@ -115,6 +115,9 @@ export interface DineInOrder {
   total: number;
   status: string;
   orderSource: "qr" | "waiter";
+  promotionName?: string;
+  promotionDiscount?: number;
+  bonusUsed?: number;
   createdAt: string;
 }
 
