@@ -10,6 +10,9 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
+      // Dine-in sahifalari indekslanmaydi — har stol uchun
+      // alohida havola, ular ochiq bo'lmasligi kerak
+      disallow: ["/d/", "/waiter"],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
     host: SITE_URL,

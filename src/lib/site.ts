@@ -38,3 +38,10 @@ export const SITE_DESCRIPTION =
 export const SITE_DESCRIPTION_SHORT =
   "Namangan va Toshkentdagi restoran va kafelardan ovqat yetkazib berish. " +
   "Osh, shashlik, lavash, pitsa — 25-40 daqiqada eshigingizgacha.";
+
+// Backend API manzili
+export const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://apilokma.poppolizol.uz/api";
+
+// Ofitsiant paneli domeni
+export const WAITER_HOST = "waiter.lokma.uz";
