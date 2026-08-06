@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { waiterApi, type WaiterTable, type Dish, type DishOption, ApiError } from "@/lib/dinein/api";
 import { som, num } from "@/lib/dinein/format";
+import { cached } from "@/lib/dinein/cache";
 import { DishSheet } from "@/components/dinein/DishSheet";
 
 interface Me {
@@ -38,6 +39,7 @@ export function WaiterTables({
   onLogout: () => void;
 }) {
   const [active, setActive] = useState<WaiterTable | null>(null);
+  const [view, setView] = useState<"tables" | "orders">("tables");
 
   // Stollar holati — 30 soniyada yangilanadi
   useEffect(() => {
@@ -67,6 +69,22 @@ export function WaiterTables({
         <button onClick={onLogout} className="wt-logout">Chiqish</button>
       </header>
 
+      {/* Bo'limlar */}
+      <div className="wt-tabs">
+        <button onClick={() => setView("tables")}
+          className={`wt-tab ${view === "tables" ? "is-active" : ""}`}>
+          Stollar
+        </button>
+        <button onClick={() => setView("orders")}
+          className={`wt-tab ${view === "orders" ? "is-active" : ""}`}>
+          Buyurtmalarim
+        </button>
+      </div>
+
+      {view === "orders" ? (
+        <MyWaiterOrders />
+      ) : (
+        <>
       {/* Chaqiruvlar */}
       <WaiterRequests onDone={onRefresh} />
 
@@ -114,6 +132,8 @@ export function WaiterTables({
           </div>
         )}
       </main>
+        </>
+      )}
     </div>
   );
 }
@@ -135,7 +155,7 @@ function WaiterOrder({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    waiterApi.menu(restaurantId)
+    cached(`menu:${restaurantId}`, () => waiterApi.menu(restaurantId))
       .then(setDishes)
       .catch(() => setDishes([]))
       .finally(() => setLoading(false));
@@ -353,5 +373,120 @@ function WaiterRequests({ onDone }: { onDone: () => void }) {
         </div>
       ))}
     </div>
+  );
+}
+
+/** Ofitsiant o'z buyurtmalari va bugungi natijasi. */
+function MyWaiterOrders() {
+  const [data, setData] = useState<{
+    orders: Array<{
+      _id: string; dineInNumber: string; total: number; status: string;
+      serviceFee: number; createdAt: string;
+      items: Array<{ name: string; quantity: number }>;
+      tableId?: { tableNumber: string; tableName?: string };
+    }>;
+    today: { orders: number; sales: number; serviceFee: number };
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    try {
+      setData(await waiterApi.orders());
+    } catch {
+      /* ignore */
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+    const timer = setInterval(load, 30000);
+    return () => clearInterval(timer);
+  }, [load]);
+
+  const LABEL: Record<string, string> = {
+    pending: "Yangi", accepted: "Qabul", preparing: "Tayyorlanmoqda",
+    ready: "Tayyor", served: "Berildi", completed: "Yakunlandi",
+    cancelled: "Bekor",
+  };
+
+  if (loading) {
+    return <div className="di-loading"><div className="di-spinner" /></div>;
+  }
+
+  return (
+    <>
+      {data?.today && (
+        <div className="wt-today">
+          <div>
+            <div className="wt-today__label">Bugungi savdo</div>
+            <div className="wt-today__value">{num(data.today.sales)}</div>
+          </div>
+          <div>
+            <div className="wt-today__label">Xizmat haqi</div>
+            <div className="wt-today__value is-accent">{num(data.today.serviceFee)}</div>
+          </div>
+          <div>
+            <div className="wt-today__label">Buyurtma</div>
+            <div className="wt-today__value">{data.today.orders}</div>
+          </div>
+        </div>
+      )}
+
+      <main className="di-list">
+        {!data?.orders?.length ? (
+          <div className="di-empty">
+            <div className="di-empty__icon">📋</div>
+            <p>Buyurtma yo&apos;q</p>
+          </div>
+        ) : (
+          data.orders.map((o) => (
+            <div key={o._id} className="di-order">
+              <div className="di-order__head">
+                <span className="di-order__num">#{o.dineInNumber}</span>
+                <span className="di-order__status is-new">
+                  {LABEL[o.status] || o.status}
+                </span>
+              </div>
+
+              <div className="di-order__items">
+                <div className="di-order__item">
+                  <span>
+                    {o.tableId?.tableName || `Stol ${o.tableId?.tableNumber}`}
+                    {" · "}
+                    {new Date(o.createdAt).toLocaleTimeString("ru-RU", {
+                      hour: "2-digit", minute: "2-digit",
+                    })}
+                  </span>
+                </div>
+                {o.items?.slice(0, 3).map((it, i) => (
+                  <div key={i} className="di-order__item">
+                    <span>{it.name} ×{it.quantity}</span>
+                  </div>
+                ))}
+                {o.items && o.items.length > 3 && (
+                  <div className="di-order__item">
+                    <span>+{o.items.length - 3} ta</span>
+                  </div>
+                )}
+              </div>
+
+              {o.serviceFee > 0 && (
+                <div className="di-order__fee">
+                  <span>Sizning ulushingiz</span>
+                  <span style={{ color: "var(--di-brand)" }}>{som(o.serviceFee)}</span>
+                </div>
+              )}
+
+              <div className="di-order__total">
+                <span>Jami</span>
+                <b>{som(o.total)}</b>
+              </div>
+            </div>
+          ))
+        )}
+      </main>
+    </>
   );
 }

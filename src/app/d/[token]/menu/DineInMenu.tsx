@@ -8,6 +8,7 @@ import { useCart } from "@/lib/dinein/cart";
 import { DishSheet } from "@/components/dinein/DishSheet";
 import { CartSheet } from "@/components/dinein/CartSheet";
 import { som } from "@/lib/dinein/format";
+import { cached } from "@/lib/dinein/cache";
 import { TableActions } from "@/components/dinein/TableActions";
 
 export function DineInMenu({ token }: { token: string }) {
@@ -31,8 +32,8 @@ export function DineInMenu({ token }: { token: string }) {
     }
     setSession(s);
 
-    dineInApi
-      .menu(s.restaurantId)
+    // Keshdan — QR qayta skanerlanganda tez ochiladi
+    cached(`menu:${s.restaurantId}`, () => dineInApi.menu(s.restaurantId))
       .then(setDishes)
       .catch(() => setDishes([]))
       .finally(() => setLoading(false));

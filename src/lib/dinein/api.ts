@@ -226,6 +226,14 @@ export const waiterApi = {
   menu: (restaurantId: string) =>
     request<Dish[]>(`/waiter/menu/${restaurantId}`, { auth: true }),
 
+  orders: (active?: boolean) =>
+    request<{
+      orders: Array<DineInOrder & {
+        tableId?: { tableNumber: string; tableName?: string };
+      }>;
+      today: { orders: number; sales: number; serviceFee: number };
+    }>(`/waiter/orders${active ? "?active=1" : ""}`, { auth: true }),
+
   requests: () =>
     request<Array<{
       _id: string; type: string; status: string;

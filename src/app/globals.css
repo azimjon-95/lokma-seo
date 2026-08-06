@@ -790,3 +790,42 @@ body {
 }
 
 .di-order__fee--discount { color: var(--di-success); }
+
+/* ─── Ofitsiant bo'limlari ─── */
+.wt-tabs {
+  display: flex; gap: 8px;
+  padding: 12px 16px 0;
+}
+.wt-tab {
+  flex: 1;
+  padding: 10px;
+  border-radius: 13px;
+  background: var(--di-surface);
+  border: 1px solid transparent;
+  color: var(--di-muted);
+  font-size: 14px; font-weight: 570;
+}
+.wt-tab.is-active {
+  border-color: var(--di-brand);
+  background: rgba(245, 165, 36, 0.1);
+  color: var(--di-brand);
+  font-weight: 650;
+}
+
+.wt-today {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 12px 16px 0;
+  padding: 14px;
+  background: var(--di-surface);
+  border: 0.5px solid var(--di-line);
+  border-radius: 16px;
+  text-align: center;
+}
+.wt-today__label { font-size: 10.5px; color: var(--di-muted); }
+.wt-today__value {
+  font-size: 15px; font-weight: 700;
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+.wt-today__value.is-accent { color: var(--di-brand); }
