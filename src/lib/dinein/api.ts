@@ -145,6 +145,26 @@ export const dineInApi = {
       body: JSON.stringify({ sessionId, items, note }),
     }),
 
+  createRequest: (sessionId: string, type: "waiter" | "bill") =>
+    request<{ _id: string; type: string; status: string }>("/dine-in/request", {
+      method: "POST",
+      body: JSON.stringify({ sessionId, type }),
+    }),
+
+  myRequests: (sessionId: string) =>
+    request<Array<{ _id: string; type: string; status: string; acceptedByName?: string }>>(
+      `/dine-in/requests/${sessionId}`,
+    ),
+
+  receipt: (sessionId: string) =>
+    request<{
+      restaurant: { name: string; address?: string };
+      table: { tableNumber: string; tableName?: string };
+      lines: Array<{ name: string; quantity: number; total: number }>;
+      subtotal: number; serviceFee: number; discount: number; total: number;
+      serviceFeeLabel: string;
+    }>(`/dine-in/receipt/${sessionId}`),
+
   sessionOrders: (sessionId: string) =>
     request<{ orders: DineInOrder[]; total: number; sessionStatus: string }>(
       `/dine-in/orders/${sessionId}`,
@@ -202,6 +222,19 @@ export const waiterApi = {
 
   menu: (restaurantId: string) =>
     request<Dish[]>(`/waiter/menu/${restaurantId}`, { auth: true }),
+
+  requests: () =>
+    request<Array<{
+      _id: string; type: string; status: string;
+      tableId?: { tableNumber: string; tableName?: string };
+      createdAt: string;
+    }>>("/waiter/requests", { auth: true }),
+
+  updateRequest: (id: string, status: "accepted" | "done") =>
+    request(`/waiter/requests/${id}`, {
+      method: "PATCH", auth: true,
+      body: JSON.stringify({ status }),
+    }),
 
   createOrder: (tableId: string, items: unknown[], note?: string) =>
     request<DineInOrder>("/waiter/orders", {

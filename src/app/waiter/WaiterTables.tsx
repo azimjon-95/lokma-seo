@@ -67,6 +67,9 @@ export function WaiterTables({
         <button onClick={onLogout} className="wt-logout">Chiqish</button>
       </header>
 
+      {/* Chaqiruvlar */}
+      <WaiterRequests onDone={onRefresh} />
+
       {me.earnings && me.earnings.total > 0 && (
         <div className="wt-earnings">
           <span>Daromadingiz</span>
@@ -287,6 +290,68 @@ function WaiterOrder({
           }}
         />
       )}
+    </div>
+  );
+}
+
+
+/** Ofitsiant chaqiruvlari — stol so'rovlari. */
+function WaiterRequests({ onDone }: { onDone: () => void }) {
+  const [items, setItems] = useState<Array<{
+    _id: string; type: string; status: string;
+    tableId?: { tableNumber: string; tableName?: string };
+    createdAt: string;
+  }>>([]);
+
+  const load = useCallback(async () => {
+    try {
+      setItems(await waiterApi.requests());
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+    const timer = setInterval(load, 15000);
+    return () => clearInterval(timer);
+  }, [load]);
+
+  const act = async (id: string, status: "accepted" | "done") => {
+    try {
+      await waiterApi.updateRequest(id, status);
+      load();
+      onDone();
+    } catch {
+      /* ignore */
+    }
+  };
+
+  if (items.length === 0) return null;
+
+  return (
+    <div className="wt-requests">
+      {items.map((r) => (
+        <div key={r._id} className={`wt-request ${r.type === "bill" ? "is-bill" : ""}`}>
+          <span className="wt-request__icon">
+            {r.type === "bill" ? "🧾" : "🛎"}
+          </span>
+          <div className="wt-request__body">
+            <div className="wt-request__title">
+              {r.type === "bill" ? "Hisob so'ralmoqda" : "Chaqirmoqda"}
+            </div>
+            <div className="wt-request__table">
+              Stol {r.tableId?.tableNumber}
+            </div>
+          </div>
+          <button
+            onClick={() => act(r._id, r.status === "pending" ? "accepted" : "done")}
+            className="wt-request__btn"
+          >
+            {r.status === "pending" ? "Qabul" : "Bajarildi"}
+          </button>
+        </div>
+      ))}
     </div>
   );
 }

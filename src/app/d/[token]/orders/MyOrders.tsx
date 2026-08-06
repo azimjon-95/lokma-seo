@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { dineInApi, type DineInOrder } from "@/lib/dinein/api";
 import { loadSession, type StoredSession } from "@/lib/dinein/session";
 import { som } from "@/lib/dinein/format";
+import { TableActions } from "@/components/dinein/TableActions";
+import { useSessionSocket } from "@/lib/dinein/socket";
 
 const STATUS: Record<string, { label: string; cls: string }> = {
   pending: { label: "Yuborildi", cls: "is-new" },
@@ -44,12 +46,19 @@ export function MyOrders({ token }: { token: string }) {
     setSession(s);
     load(s);
 
-    // Holat yangilanishi — 20 soniyada bir marta.
-    // Socket o'rniga oddiy so'rov: bu sahifa qisqa vaqt ochiq
-    // turadi va ulanish qimmatga tushadi.
-    const timer = setInterval(() => load(s), 20000);
+    // Socket ulanmasa ham yangilanadi — zaxira
+    const timer = setInterval(() => load(s), 30000);
     return () => clearInterval(timer);
   }, [token, router, load]);
+
+  // Real vaqtda holat yangilanishi
+  useSessionSocket(session?.sessionId, {
+    onStatus: () => { if (session) load(session); },
+    onSessionClosed: () => {
+      alert("Stol yopildi. Rahmat!");
+      router.replace(`/d/${token}`);
+    },
+  });
 
   if (!session) return null;
 
@@ -68,6 +77,9 @@ export function MyOrders({ token }: { token: string }) {
           </div>
         </div>
       </header>
+
+      {/* Ofitsiant chaqirish va hisob */}
+      <TableActions sessionId={session.sessionId} />
 
       <main className="di-list">
         {loading ? (

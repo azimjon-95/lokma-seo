@@ -687,3 +687,94 @@ body {
   font-size: 14px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+
+/* ─── Chaqiruv tugmalari ─── */
+.di-actions {
+  display: flex; gap: 10px;
+  padding: 12px 16px 4px;
+}
+.di-action {
+  flex: 1;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px;
+  background: var(--di-surface);
+  border: 1px solid var(--di-line);
+  border-radius: 15px;
+  color: var(--di-ink);
+  font-size: 13.5px; font-weight: 570;
+  transition: all 0.15s;
+}
+.di-action:active { transform: scale(0.98); }
+.di-action.is-sent {
+  border-color: var(--di-brand);
+  background: rgba(245, 165, 36, 0.1);
+  color: var(--di-brand);
+}
+.di-action:disabled { opacity: 0.75; }
+.di-action__icon { font-size: 16px; }
+
+.di-header__orders {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+  font-size: 17px;
+  flex: none;
+  margin-left: auto;
+}
+
+.di-toast {
+  position: fixed;
+  bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+  left: 50%; transform: translateX(-50%);
+  z-index: 70;
+  background: rgba(30, 26, 23, 0.96);
+  backdrop-filter: blur(10px);
+  color: var(--di-ink);
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  border: 0.5px solid var(--di-line);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  animation: di-toast-in 0.25s ease;
+  max-width: calc(100vw - 40px);
+  text-align: center;
+}
+@keyframes di-toast-in {
+  from { opacity: 0; transform: translate(-50%, 10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ─── Ofitsiant chaqiruvlari ─── */
+.wt-requests {
+  padding: 12px 16px 0;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.wt-request {
+  display: flex; align-items: center; gap: 11px;
+  padding: 12px 14px;
+  background: rgba(245, 165, 36, 0.12);
+  border: 1px solid rgba(245, 165, 36, 0.3);
+  border-radius: 15px;
+}
+.wt-request.is-bill {
+  background: rgba(155, 122, 233, 0.12);
+  border-color: rgba(155, 122, 233, 0.3);
+}
+.wt-request__icon { font-size: 20px; flex: none; }
+.wt-request__body { flex: 1; min-width: 0; }
+.wt-request__title {
+  font-size: 14px; font-weight: 600;
+  color: var(--di-ink);
+}
+.wt-request__table {
+  font-size: 12px; color: var(--di-muted);
+  margin-top: 1px;
+}
+.wt-request__btn {
+  padding: 8px 14px;
+  border-radius: 11px;
+  background: var(--di-ink);
+  color: var(--di-bg);
+  font-size: 13px; font-weight: 620;
+  flex: none;
+}

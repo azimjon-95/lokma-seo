@@ -8,6 +8,7 @@ import { useCart } from "@/lib/dinein/cart";
 import { DishSheet } from "@/components/dinein/DishSheet";
 import { CartSheet } from "@/components/dinein/CartSheet";
 import { som } from "@/lib/dinein/format";
+import { TableActions } from "@/components/dinein/TableActions";
 
 export function DineInMenu({ token }: { token: string }) {
   const router = useRouter();
@@ -72,7 +73,16 @@ export function DineInMenu({ token }: { token: string }) {
             ? `${session.tableName} · ${session.tableNumber}`
             : `Stol ${session.tableNumber}`}
         </div>
+        <button
+          onClick={() => router.push(`/d/${token}/orders`)}
+          className="di-header__orders"
+        >
+          📦
+        </button>
       </header>
+
+      {/* Ofitsiant chaqirish */}
+      <TableActions sessionId={session.sessionId} />
 
       {/* Bo'limlar */}
       {sections.length > 1 && (
