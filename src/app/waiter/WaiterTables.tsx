@@ -5,7 +5,7 @@ import { waiterApi, type WaiterTable, type Dish, type DishOption, ApiError } fro
 import { som, num } from "@/lib/dinein/format";
 import { cached } from "@/lib/dinein/cache";
 import { DishSheet } from "@/components/dinein/DishSheet";
-import { TableMap3D } from "@/components/dinein/TableMap3D";
+import { TableGrid } from "@/components/dinein/TableGrid";
 import { TableSheet } from "@/components/dinein/TableSheet";
 
 interface Me {
@@ -42,7 +42,6 @@ export function WaiterTables({
 }) {
   const [active, setActive] = useState<WaiterTable | null>(null);
   const [view, setView] = useState<"tables" | "orders">("tables");
-  const [map3d, setMap3d] = useState(true);
   const [sheet, setSheet] = useState<WaiterTable | null>(null);
 
   // Stollar holati — 30 soniyada yangilanadi
@@ -99,24 +98,6 @@ export function WaiterTables({
           <span className="wt-earnings__sub">{me.earnings.orders} buyurtma</span>
         </div>
       )}
-
-      {/* Ko'rinish tanlash */}
-      {tables.length > 0 && (
-        <div className="wt-viewmode">
-          <button onClick={() => setMap3d(true)}
-            className={map3d ? "is-active" : ""}>
-            Zal xaritasi
-          </button>
-          <button onClick={() => setMap3d(false)}
-            className={!map3d ? "is-active" : ""}>
-            Ro&apos;yxat
-          </button>
-        </div>
-      )}
-
-      {map3d && tables.length > 0 ? (
-        <TableMap3D tables={tables} onSelect={setSheet} />
-      ) : (
       <main className="di-list">
         {tables.length === 0 ? (
           <div className="di-empty">
@@ -124,36 +105,9 @@ export function WaiterTables({
             <p>Stol biriktirilmagan</p>
           </div>
         ) : (
-          <div className="wt-grid">
-            {tables.map((t) => {
-              const orders = t.activeOrders || [];
-              const total = orders.reduce((s, o) => s + (o.total || 0), 0);
-
-              return (
-                <button
-                  key={t._id}
-                  onClick={() => setActive(t)}
-                  className={`wt-table ${t.session ? "is-busy" : ""}`}
-                >
-                  <div className="wt-table__num">{t.tableNumber}</div>
-                  {t.tableName && (
-                    <div className="wt-table__name">{t.tableName}</div>
-                  )}
-                  <div className="wt-table__status">
-                    {TABLE_STATUS[t.status] || t.status}
-                  </div>
-                  {orders.length > 0 && (
-                    <div className="wt-table__orders">
-                      {orders.length} buyurtma · {num(total)}
-                    </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
+          <TableGrid tables={tables} onSelect={setSheet} />
         )}
       </main>
-      )}
 
       {sheet && (
         <TableSheet

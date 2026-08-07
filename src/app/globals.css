@@ -1010,233 +1010,6 @@ body {
 }
 .wt-today__value.is-accent { color: var(--di-brand); }
 
-/* ═══════════════════════════════════════════
-   3D ZAL XARITASI
-   Three.js emas — CSS transform, GPU'da bajariladi
-   ═══════════════════════════════════════════ */
-.map3d {
-  position: relative;
-  height: calc(100dvh - 190px);
-  min-height: 380px;
-  overflow: hidden;
-  background:
-    radial-gradient(ellipse at 50% 40%, #241F1B 0%, #14110F 70%);
-}
-
-.map3d__stage {
-  width: 100%; height: 100%;
-  perspective: 1100px;
-  perspective-origin: 50% 42%;
-  touch-action: none;
-  cursor: grab;
-  display: flex; align-items: center; justify-content: center;
-}
-.map3d__stage:active { cursor: grabbing; }
-
-.map3d__world {
-  position: relative;
-  transform-style: preserve-3d;
-  will-change: transform;
-  /* Silliq, lekin sudrab yurganda kechikmasin */
-  transition: transform 0.06s linear;
-}
-
-/* Pol */
-.map3d__floor {
-  position: absolute;
-  left: 50%; top: 50%;
-  background:
-    linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%),
-    repeating-linear-gradient(0deg,
-      rgba(255,255,255,0.025) 0 1px, transparent 1px 48px),
-    repeating-linear-gradient(90deg,
-      rgba(255,255,255,0.025) 0 1px, transparent 1px 48px),
-    #1A1613;
-  border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.06);
-  box-shadow: inset 0 0 60px rgba(0,0,0,0.5);
-}
-
-/* ─── Stol ─── */
-.t3d {
-  position: absolute;
-  left: 0; top: 0;
-  transform-style: preserve-3d;
-  cursor: pointer;
-}
-
-.t3d__shadow {
-  position: absolute;
-  left: 50%; top: 50%;
-  margin-left: -50%; margin-top: -50%;
-  background: radial-gradient(ellipse, rgba(0,0,0,0.55) 0%, transparent 70%);
-  border-radius: 50%;
-  transform: translate(-50%, -50%) translateZ(0.5px);
-}
-
-.t3d__leg {
-  position: absolute;
-  left: 50%; top: 50%;
-  transform-origin: center bottom;
-  background: linear-gradient(180deg, #3A322A 0%, #241E18 100%);
-  margin-left: -50%; margin-top: -50%;
-}
-.t3d__leg.is-busy {
-  background: linear-gradient(180deg, #4A2420 0%, #2E1613 100%);
-}
-
-.t3d__top {
-  position: absolute;
-  left: 50%; top: 50%;
-  margin-left: -50%; margin-top: -50%;
-  transform-style: preserve-3d;
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  transition: box-shadow 0.2s, filter 0.2s;
-}
-.t3d__top.is-round { border-radius: 50%; }
-
-/* Bo'sh — yashil */
-.t3d__top.is-free {
-  background:
-    radial-gradient(circle at 35% 30%, rgba(255,255,255,0.18) 0%, transparent 55%),
-    linear-gradient(145deg, #4E8C52 0%, #33683A 100%);
-  box-shadow:
-    0 0 0 1.5px rgba(111,191,115,0.4),
-    0 8px 18px rgba(0,0,0,0.4);
-}
-
-/* Band — qizil */
-.t3d__top.is-busy {
-  background:
-    radial-gradient(circle at 35% 30%, rgba(255,255,255,0.2) 0%, transparent 55%),
-    linear-gradient(145deg, #C4483F 0%, #8E2E27 100%);
-  box-shadow:
-    0 0 0 1.5px rgba(225,75,66,0.5),
-    0 8px 18px rgba(0,0,0,0.45),
-    0 0 24px rgba(225,75,66,0.25);
-}
-
-.t3d:active .t3d__top { filter: brightness(1.25); }
-
-/* Yorliq — doim tik */
-.t3d__label {
-  transform-style: preserve-3d;
-  text-align: center;
-  pointer-events: none;
-  line-height: 1;
-}
-.t3d__num {
-  display: block;
-  font-size: 19px; font-weight: 800;
-  color: #fff;
-  text-shadow: 0 2px 5px rgba(0,0,0,0.6);
-  font-variant-numeric: tabular-nums;
-}
-.t3d__guests {
-  display: block;
-  font-size: 10.5px; font-weight: 700;
-  color: rgba(255,255,255,0.9);
-  margin-top: 3px;
-  background: rgba(0,0,0,0.35);
-  border-radius: 999px;
-  padding: 1.5px 7px;
-  white-space: nowrap;
-}
-
-/* Kursilar */
-.t3d__chair {
-  position: absolute;
-  left: 50%; top: 50%;
-  width: 14px; height: 14px;
-  border-radius: 4px 4px 2px 2px;
-  background: linear-gradient(180deg, #3E362E 0%, #2A241E 100%);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-}
-.t3d__chair.is-taken {
-  background: linear-gradient(180deg, #7A5A3A 0%, #5A4028 100%);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.5), 0 0 8px rgba(245,165,36,0.2);
-}
-
-/* Summa */
-.t3d__total {
-  position: absolute;
-  left: 50%; top: 50%;
-  margin-top: 34px;
-  transform-style: preserve-3d;
-  background: rgba(20,17,15,0.9);
-  border: 1px solid rgba(245,165,36,0.35);
-  color: var(--di-brand);
-  font-size: 10px; font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 999px;
-  white-space: nowrap;
-  pointer-events: none;
-  transform-origin: center;
-  margin-left: -50%;
-  font-variant-numeric: tabular-nums;
-}
-
-/* ─── Boshqaruv ─── */
-.map3d__controls {
-  position: absolute;
-  right: 12px; top: 12px;
-  z-index: 10;
-  display: flex; flex-direction: column; gap: 6px;
-}
-.map3d__controls button {
-  width: 36px; height: 36px;
-  border-radius: 11px;
-  background: rgba(30,26,23,0.85);
-  backdrop-filter: blur(8px);
-  border: 0.5px solid var(--di-line);
-  color: var(--di-ink);
-  font-size: 17px;
-  display: flex; align-items: center; justify-content: center;
-}
-.map3d__controls button:active { background: rgba(50,44,38,0.9); }
-
-/* ─── Izoh ─── */
-.map3d__legend {
-  position: absolute;
-  left: 12px; bottom: 12px; right: 12px;
-  z-index: 10;
-  display: flex; align-items: center; gap: 14px;
-  font-size: 11.5px; color: var(--di-muted);
-  background: rgba(20,17,15,0.8);
-  backdrop-filter: blur(8px);
-  border-radius: 999px;
-  padding: 8px 14px;
-}
-.map3d__legend span { display: flex; align-items: center; gap: 5px; }
-.map3d__legend .dot {
-  width: 9px; height: 9px; border-radius: 50%;
-}
-.map3d__legend .dot.is-free { background: #4E8C52; }
-.map3d__legend .dot.is-busy { background: #C4483F; }
-.map3d__hint { margin-left: auto; opacity: 0.65; }
-
-/* Ko'rinish tanlash */
-.wt-viewmode {
-  display: flex; gap: 6px;
-  margin: 12px 16px 0;
-  padding: 3px;
-  background: var(--di-surface);
-  border-radius: 13px;
-}
-.wt-viewmode button {
-  flex: 1;
-  padding: 8px;
-  border-radius: 10px;
-  color: var(--di-muted);
-  font-size: 13px; font-weight: 570;
-  transition: all 0.18s;
-}
-.wt-viewmode button.is-active {
-  background: var(--di-brand);
-  color: var(--di-brand-text);
-  font-weight: 650;
-}
 
 /* ─── Stol paneli ─── */
 .ts-head {
@@ -1353,4 +1126,162 @@ body {
   color: var(--di-danger);
   font-size: 14px; font-weight: 620;
   flex: none;
+}
+
+/* ═══════════════════════════════════════════
+   STOLLAR — qatorda ikkitadan
+   ═══════════════════════════════════════════ */
+.tg {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 12px 16px 16px;
+}
+
+.tg-card {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 10px;
+  padding: 18px 12px 14px;
+  background: var(--di-surface);
+  border: 1px solid var(--di-line);
+  border-radius: 20px;
+  transition: transform 0.14s var(--ease, ease), border-color 0.16s;
+}
+.tg-card:active { transform: scale(0.97); }
+.tg-card.is-busy {
+  border-color: rgba(225, 75, 66, 0.35);
+  background: linear-gradient(180deg,
+    rgba(225, 75, 66, 0.07) 0%,
+    var(--di-surface) 60%);
+}
+
+/* ─── Stol chizmasi ─── */
+.tg-table {
+  position: relative;
+  width: 118px; height: 118px;
+  display: flex; align-items: center; justify-content: center;
+  flex: none;
+}
+
+/* Stol usti — yumaloq */
+.tg-top {
+  position: relative;
+  width: 62px; height: 62px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+
+  /* Yog'och sirt */
+  background:
+    radial-gradient(circle at 34% 28%,
+      rgba(255, 255, 255, 0.22) 0%,
+      transparent 50%),
+    linear-gradient(150deg, #8A6A45 0%, #6B5034 55%, #543E28 100%);
+
+  box-shadow:
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 2px 3px rgba(255, 255, 255, 0.15),
+    0 4px 10px rgba(0, 0, 0, 0.4);
+  z-index: 2;
+}
+
+/* Band stol — qizil halqa */
+.tg-card.is-busy .tg-top {
+  box-shadow:
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 2px 3px rgba(255, 255, 255, 0.15),
+    0 4px 10px rgba(0, 0, 0, 0.4),
+    0 0 0 2.5px rgba(225, 75, 66, 0.6);
+}
+/* Bo'sh stol — yashil halqa */
+.tg-card:not(.is-busy) .tg-top {
+  box-shadow:
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 2px 3px rgba(255, 255, 255, 0.15),
+    0 4px 10px rgba(0, 0, 0, 0.4),
+    0 0 0 2.5px rgba(111, 191, 115, 0.5);
+}
+
+.tg-top__num {
+  font-size: 20px; font-weight: 800;
+  color: #fff;
+  text-shadow: 0 1.5px 4px rgba(0, 0, 0, 0.6);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Stullar ─── */
+.tg-chair {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 22px; height: 24px;
+  margin-left: -11px; margin-top: -12px;
+  transform-origin: center 12px;
+  z-index: 1;
+}
+
+/* Suyanchiq */
+.tg-chair__back {
+  position: absolute;
+  left: 2px; top: 0;
+  width: 18px; height: 9px;
+  border-radius: 5px 5px 2px 2px;
+  background: linear-gradient(180deg, #4A3F35 0%, #332B23 100%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* O'tirg'ich */
+.tg-chair__seat {
+  position: absolute;
+  left: 0; top: 8px;
+  width: 22px; height: 15px;
+  border-radius: 4px 4px 7px 7px;
+  background: linear-gradient(180deg, #3E352C 0%, #2A241D 100%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Band stul — issiq rangda */
+.tg-chair.is-taken .tg-chair__back {
+  background: linear-gradient(180deg, #9C6F3E 0%, #77522C 100%);
+}
+.tg-chair.is-taken .tg-chair__seat {
+  background: linear-gradient(180deg, #8A6234 0%, #654724 100%);
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.45),
+    0 0 8px rgba(245, 165, 36, 0.25);
+}
+
+/* ─── Ma'lumot ─── */
+.tg-info { text-align: center; width: 100%; }
+
+.tg-info__name {
+  font-size: 13.5px; font-weight: 620;
+  color: var(--di-ink);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.tg-info__status {
+  font-size: 11.5px; font-weight: 600;
+  margin-top: 3px;
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+.tg-info__status.is-free {
+  color: var(--di-success);
+  background: rgba(111, 191, 115, 0.14);
+}
+.tg-info__status.is-busy {
+  color: var(--di-danger);
+  background: rgba(225, 75, 66, 0.14);
+}
+
+.tg-info__total {
+  font-size: 12px; font-weight: 700;
+  color: var(--di-brand);
+  margin-top: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Katta ekranda uch ustun */
+@media (min-width: 520px) {
+  .tg { grid-template-columns: repeat(3, 1fr); }
 }
