@@ -5,6 +5,8 @@ import { waiterApi, type WaiterTable, type Dish, type DishOption, ApiError } fro
 import { som, num } from "@/lib/dinein/format";
 import { cached } from "@/lib/dinein/cache";
 import { DishSheet } from "@/components/dinein/DishSheet";
+import { TableMap3D } from "@/components/dinein/TableMap3D";
+import { TableSheet } from "@/components/dinein/TableSheet";
 
 interface Me {
   firstName: string;
@@ -40,6 +42,8 @@ export function WaiterTables({
 }) {
   const [active, setActive] = useState<WaiterTable | null>(null);
   const [view, setView] = useState<"tables" | "orders">("tables");
+  const [map3d, setMap3d] = useState(true);
+  const [sheet, setSheet] = useState<WaiterTable | null>(null);
 
   // Stollar holati — 30 soniyada yangilanadi
   useEffect(() => {
@@ -96,6 +100,23 @@ export function WaiterTables({
         </div>
       )}
 
+      {/* Ko'rinish tanlash */}
+      {tables.length > 0 && (
+        <div className="wt-viewmode">
+          <button onClick={() => setMap3d(true)}
+            className={map3d ? "is-active" : ""}>
+            Zal xaritasi
+          </button>
+          <button onClick={() => setMap3d(false)}
+            className={!map3d ? "is-active" : ""}>
+            Ro&apos;yxat
+          </button>
+        </div>
+      )}
+
+      {map3d && tables.length > 0 ? (
+        <TableMap3D tables={tables} onSelect={setSheet} />
+      ) : (
       <main className="di-list">
         {tables.length === 0 ? (
           <div className="di-empty">
@@ -132,6 +153,20 @@ export function WaiterTables({
           </div>
         )}
       </main>
+      )}
+
+      {sheet && (
+        <TableSheet
+          table={sheet}
+          onClose={() => setSheet(null)}
+          onRefresh={onRefresh}
+          onNewOrder={() => {
+            const t = sheet;
+            setSheet(null);
+            setActive(t);
+          }}
+        />
+      )}
         </>
       )}
     </div>

@@ -127,6 +127,12 @@ export interface WaiterTable {
   tableName?: string;
   capacity: number;
   status: string;
+  guestCount?: number;
+  orderTotal?: number;
+  isBusy?: boolean;
+  shape?: string;
+  x?: number;
+  y?: number;
   session?: { _id: string } | null;
   activeOrders?: Array<{ _id: string; total: number; status: string; dineInNumber: string }>;
 }
@@ -225,6 +231,32 @@ export const waiterApi = {
 
   menu: (restaurantId: string) =>
     request<Dish[]>(`/waiter/menu/${restaurantId}`, { auth: true }),
+
+  setOrderStatus: (orderId: string, status: string) =>
+    request(`/waiter/orders/${orderId}/status`, {
+      method: "PATCH", auth: true,
+      body: JSON.stringify({ status }),
+    }),
+
+  closeTable: (tableId: string, force?: boolean) =>
+    request(`/waiter/tables/${tableId}/close`, {
+      method: "POST", auth: true,
+      body: JSON.stringify({ force }),
+    }),
+
+  tableDetail: (id: string) =>
+    request<{
+      table: WaiterTable & { guestCount: number; capacity: number; shape?: string };
+      session: { _id: string; guestCount?: number } | null;
+      orders: Array<DineInOrder & { note?: string }>;
+      summary: { orders: number; subtotal: number; serviceFee: number; total: number };
+    }>(`/waiter/tables/${id}`, { auth: true }),
+
+  setGuests: (id: string, count: number) =>
+    request<{ guestCount: number; status: string }>(`/waiter/tables/${id}/guests`, {
+      method: "PATCH", auth: true,
+      body: JSON.stringify({ count }),
+    }),
 
   orders: (active?: boolean) =>
     request<{

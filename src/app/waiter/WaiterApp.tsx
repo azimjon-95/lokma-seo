@@ -6,6 +6,7 @@ import {
   type WaiterTable, ApiError,
 } from "@/lib/dinein/api";
 import { getDeviceId, getDeviceLabel } from "@/lib/dinein/session";
+import { getWaiterSocket } from "@/lib/dinein/socket";
 import { WaiterLogin } from "./WaiterLogin";
 import { WaiterTables } from "./WaiterTables";
 
@@ -54,6 +55,31 @@ export function WaiterApp() {
   useEffect(() => {
     boot();
   }, [boot]);
+
+  // Real vaqt: stol holati, yangi buyurtma, chaqiruv
+  useEffect(() => {
+    if (!me) return undefined;
+
+    const s = getWaiterSocket();
+    s.emit("join:restaurant", me.restaurantId);
+
+    const refresh = () => loadTables();
+    s.on("table:update", refresh);
+    s.on("dinein:new", refresh);
+    s.on("dinein:order", refresh);
+    s.on("dinein:request", refresh);
+
+    const onConnect = () => s.emit("join:restaurant", me.restaurantId);
+    s.on("connect", onConnect);
+
+    return () => {
+      s.off("table:update", refresh);
+      s.off("dinein:new", refresh);
+      s.off("dinein:order", refresh);
+      s.off("dinein:request", refresh);
+      s.off("connect", onConnect);
+    };
+  }, [me, loadTables]);
 
   const onLogin = async (login: string, password: string) => {
     const data = await waiterApi.login(

@@ -12,6 +12,11 @@ import { API_URL } from "../site";
  */
 let socket: Socket | null = null;
 
+/** Ofitsiant paneli uchun — restoran xonasiga ulanadi. */
+export function getWaiterSocket(): Socket {
+  return getSocket();
+}
+
 function getSocket(): Socket {
   if (!socket) {
     // API_URL "/api" bilan tugaydi — socket ildizga ulanadi

@@ -1009,3 +1009,348 @@ body {
   font-variant-numeric: tabular-nums;
 }
 .wt-today__value.is-accent { color: var(--di-brand); }
+
+/* ═══════════════════════════════════════════
+   3D ZAL XARITASI
+   Three.js emas — CSS transform, GPU'da bajariladi
+   ═══════════════════════════════════════════ */
+.map3d {
+  position: relative;
+  height: calc(100dvh - 190px);
+  min-height: 380px;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 40%, #241F1B 0%, #14110F 70%);
+}
+
+.map3d__stage {
+  width: 100%; height: 100%;
+  perspective: 1100px;
+  perspective-origin: 50% 42%;
+  touch-action: none;
+  cursor: grab;
+  display: flex; align-items: center; justify-content: center;
+}
+.map3d__stage:active { cursor: grabbing; }
+
+.map3d__world {
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform;
+  /* Silliq, lekin sudrab yurganda kechikmasin */
+  transition: transform 0.06s linear;
+}
+
+/* Pol */
+.map3d__floor {
+  position: absolute;
+  left: 50%; top: 50%;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%),
+    repeating-linear-gradient(0deg,
+      rgba(255,255,255,0.025) 0 1px, transparent 1px 48px),
+    repeating-linear-gradient(90deg,
+      rgba(255,255,255,0.025) 0 1px, transparent 1px 48px),
+    #1A1613;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.5);
+}
+
+/* ─── Stol ─── */
+.t3d {
+  position: absolute;
+  left: 0; top: 0;
+  transform-style: preserve-3d;
+  cursor: pointer;
+}
+
+.t3d__shadow {
+  position: absolute;
+  left: 50%; top: 50%;
+  margin-left: -50%; margin-top: -50%;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.55) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) translateZ(0.5px);
+}
+
+.t3d__leg {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform-origin: center bottom;
+  background: linear-gradient(180deg, #3A322A 0%, #241E18 100%);
+  margin-left: -50%; margin-top: -50%;
+}
+.t3d__leg.is-busy {
+  background: linear-gradient(180deg, #4A2420 0%, #2E1613 100%);
+}
+
+.t3d__top {
+  position: absolute;
+  left: 50%; top: 50%;
+  margin-left: -50%; margin-top: -50%;
+  transform-style: preserve-3d;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  transition: box-shadow 0.2s, filter 0.2s;
+}
+.t3d__top.is-round { border-radius: 50%; }
+
+/* Bo'sh — yashil */
+.t3d__top.is-free {
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255,255,255,0.18) 0%, transparent 55%),
+    linear-gradient(145deg, #4E8C52 0%, #33683A 100%);
+  box-shadow:
+    0 0 0 1.5px rgba(111,191,115,0.4),
+    0 8px 18px rgba(0,0,0,0.4);
+}
+
+/* Band — qizil */
+.t3d__top.is-busy {
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255,255,255,0.2) 0%, transparent 55%),
+    linear-gradient(145deg, #C4483F 0%, #8E2E27 100%);
+  box-shadow:
+    0 0 0 1.5px rgba(225,75,66,0.5),
+    0 8px 18px rgba(0,0,0,0.45),
+    0 0 24px rgba(225,75,66,0.25);
+}
+
+.t3d:active .t3d__top { filter: brightness(1.25); }
+
+/* Yorliq — doim tik */
+.t3d__label {
+  transform-style: preserve-3d;
+  text-align: center;
+  pointer-events: none;
+  line-height: 1;
+}
+.t3d__num {
+  display: block;
+  font-size: 19px; font-weight: 800;
+  color: #fff;
+  text-shadow: 0 2px 5px rgba(0,0,0,0.6);
+  font-variant-numeric: tabular-nums;
+}
+.t3d__guests {
+  display: block;
+  font-size: 10.5px; font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  margin-top: 3px;
+  background: rgba(0,0,0,0.35);
+  border-radius: 999px;
+  padding: 1.5px 7px;
+  white-space: nowrap;
+}
+
+/* Kursilar */
+.t3d__chair {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 14px; height: 14px;
+  border-radius: 4px 4px 2px 2px;
+  background: linear-gradient(180deg, #3E362E 0%, #2A241E 100%);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+.t3d__chair.is-taken {
+  background: linear-gradient(180deg, #7A5A3A 0%, #5A4028 100%);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5), 0 0 8px rgba(245,165,36,0.2);
+}
+
+/* Summa */
+.t3d__total {
+  position: absolute;
+  left: 50%; top: 50%;
+  margin-top: 34px;
+  transform-style: preserve-3d;
+  background: rgba(20,17,15,0.9);
+  border: 1px solid rgba(245,165,36,0.35);
+  color: var(--di-brand);
+  font-size: 10px; font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+  pointer-events: none;
+  transform-origin: center;
+  margin-left: -50%;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Boshqaruv ─── */
+.map3d__controls {
+  position: absolute;
+  right: 12px; top: 12px;
+  z-index: 10;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.map3d__controls button {
+  width: 36px; height: 36px;
+  border-radius: 11px;
+  background: rgba(30,26,23,0.85);
+  backdrop-filter: blur(8px);
+  border: 0.5px solid var(--di-line);
+  color: var(--di-ink);
+  font-size: 17px;
+  display: flex; align-items: center; justify-content: center;
+}
+.map3d__controls button:active { background: rgba(50,44,38,0.9); }
+
+/* ─── Izoh ─── */
+.map3d__legend {
+  position: absolute;
+  left: 12px; bottom: 12px; right: 12px;
+  z-index: 10;
+  display: flex; align-items: center; gap: 14px;
+  font-size: 11.5px; color: var(--di-muted);
+  background: rgba(20,17,15,0.8);
+  backdrop-filter: blur(8px);
+  border-radius: 999px;
+  padding: 8px 14px;
+}
+.map3d__legend span { display: flex; align-items: center; gap: 5px; }
+.map3d__legend .dot {
+  width: 9px; height: 9px; border-radius: 50%;
+}
+.map3d__legend .dot.is-free { background: #4E8C52; }
+.map3d__legend .dot.is-busy { background: #C4483F; }
+.map3d__hint { margin-left: auto; opacity: 0.65; }
+
+/* Ko'rinish tanlash */
+.wt-viewmode {
+  display: flex; gap: 6px;
+  margin: 12px 16px 0;
+  padding: 3px;
+  background: var(--di-surface);
+  border-radius: 13px;
+}
+.wt-viewmode button {
+  flex: 1;
+  padding: 8px;
+  border-radius: 10px;
+  color: var(--di-muted);
+  font-size: 13px; font-weight: 570;
+  transition: all 0.18s;
+}
+.wt-viewmode button.is-active {
+  background: var(--di-brand);
+  color: var(--di-brand-text);
+  font-weight: 650;
+}
+
+/* ─── Stol paneli ─── */
+.ts-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: 6px 18px 0;
+  flex: none;
+}
+.ts-head__num {
+  font-size: 20px; font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.ts-head__sub {
+  font-size: 12.5px; color: var(--di-muted);
+  margin-top: 2px;
+}
+
+.ts-guests {
+  display: flex; align-items: center; gap: 11px;
+  margin: 12px 18px 0;
+  padding: 11px 14px;
+  background: var(--di-surface-2);
+  border-radius: 14px;
+}
+.ts-guests__label {
+  font-size: 13.5px; font-weight: 570;
+  flex: 1;
+}
+.ts-guests__cap {
+  font-size: 12px; color: var(--di-muted);
+}
+
+.ts-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--di-muted);
+}
+.ts-empty__icon { font-size: 34px; margin-bottom: 10px; }
+.ts-empty p { margin: 0; font-size: 14px; }
+
+.ts-order {
+  background: var(--di-surface-2);
+  border-radius: 15px;
+  padding: 13px 14px;
+  margin-bottom: 10px;
+}
+.ts-order__head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.ts-order__num { font-size: 15px; font-weight: 700; }
+.ts-order__status {
+  font-size: 11px; font-weight: 620;
+  color: var(--di-brand);
+  background: rgba(245,165,36,0.14);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+.ts-order__items { margin-bottom: 8px; }
+.ts-order__item {
+  display: flex; justify-content: space-between; gap: 12px;
+  font-size: 13px; color: var(--di-muted);
+  padding: 2px 0;
+}
+.ts-order__note {
+  font-size: 12px; color: var(--di-muted);
+  background: rgba(255,255,255,0.04);
+  border-radius: 9px;
+  padding: 7px 10px;
+  margin-bottom: 8px;
+}
+.ts-order__foot {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  padding-top: 8px;
+  border-top: 0.5px solid var(--di-line);
+}
+.ts-order__foot b { font-size: 15px; font-variant-numeric: tabular-nums; }
+.ts-order__btn {
+  padding: 8px 14px;
+  border-radius: 11px;
+  background: var(--di-brand);
+  color: var(--di-brand-text);
+  font-size: 13px; font-weight: 620;
+}
+.ts-order__btn:disabled { opacity: 0.5; }
+
+.ts-foot {
+  flex: none;
+  padding: 14px 18px calc(14px + env(safe-area-inset-bottom, 0px));
+  border-top: 0.5px solid var(--di-line);
+}
+.ts-total { margin-bottom: 12px; }
+.ts-total__row {
+  display: flex; justify-content: space-between;
+  font-size: 13.5px; color: var(--di-muted);
+  padding: 3px 0;
+}
+.ts-total__row--sum {
+  padding-top: 8px; margin-top: 4px;
+  border-top: 0.5px solid var(--di-line);
+  color: var(--di-ink);
+  font-size: 15px;
+}
+.ts-total__row--sum b {
+  font-size: 18px; font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.ts-actions { display: flex; gap: 9px; }
+.ts-close-btn {
+  padding: 14px 18px;
+  border-radius: 15px;
+  border: 1px solid rgba(225,75,66,0.4);
+  color: var(--di-danger);
+  font-size: 14px; font-weight: 620;
+  flex: none;
+}
