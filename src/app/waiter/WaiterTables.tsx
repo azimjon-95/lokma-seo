@@ -5,9 +5,13 @@ import { waiterApi, type WaiterTable, type Dish, type DishOption, ApiError } fro
 import { som, num } from "@/lib/dinein/format";
 import { cached } from "@/lib/dinein/cache";
 import { DishSheet } from "@/components/dinein/DishSheet";
-import { TableGrid } from "@/components/dinein/TableGrid";
 import { TableSheet } from "@/components/dinein/TableSheet";
 import { FullscreenButton } from "@/components/dinein/Fullscreen";
+import {
+  Armchair, ClipboardList, BarChart3, Users, Clock, Search,
+  SlidersHorizontal, Receipt, Timer, CircleX, LogOut,
+  MoreVertical, ChevronRight, Plus,
+} from "lucide-react";
 
 interface Me {
   firstName: string;
@@ -41,16 +45,18 @@ const TABLE_STATUS: Record<string, string> = {
    "Hisob so'ralgan" alohida: u stol statusi emas, mijozning
    so'rovi (TableRequest type='bill').
    ═══════════════════════════════════════════ */
+type LucideIcon = typeof Armchair;
+
 type State = "free" | "pending" | "busy" | "bill" | "closed";
 
 const STATE: Record<State, {
-  label: string; color: string; icon: string; action: string;
+  label: string; color: string; Icon: LucideIcon; action: string;
 }> = {
-  free:    { label: "Bo'sh",           color: "#34C759", icon: "\u{1FA91}", action: "Stolni ochish" },
-  pending: { label: "Kutilmoqda",      color: "#F5A524", icon: "\u23F1",    action: "Buyurtmani ko'rish" },
-  busy:    { label: "Band",            color: "#E14B42", icon: "\u{1F465}", action: "Buyurtmani ko'rish" },
-  bill:    { label: "Hisob so'ralgan", color: "#3B82F6", icon: "\u{1F9FE}", action: "Hisob chiqarish" },
-  closed:  { label: "Yopilgan",        color: "#8E8E93", icon: "\u2716",    action: "Yopiq" },
+  free:    { label: "Bo'sh",           color: "#34C759", Icon: Armchair, action: "Stolni ochish" },
+  pending: { label: "Kutilmoqda",      color: "#F5A524", Icon: Timer,    action: "Buyurtmani ko'rish" },
+  busy:    { label: "Band",            color: "#E14B42", Icon: Users,    action: "Buyurtmani ko'rish" },
+  bill:    { label: "Hisob so'ralgan", color: "#3B82F6", Icon: Receipt,  action: "Hisob chiqarish" },
+  closed:  { label: "Yopilgan",        color: "#8E8E93", Icon: CircleX,  action: "Yopiq" },
 };
 
 const ORDER: State[] = ["free", "pending", "busy", "bill", "closed"];
@@ -81,10 +87,9 @@ export function WaiterTables({
   onLogout: () => void;
 }) {
   const [active, setActive] = useState<WaiterTable | null>(null);
-  const [tab, setTab] = useState<"tables" | "orders" | "reports" | "settings">("tables");
+  const [tab, setTab] = useState<"tables" | "orders" | "reports">("tables");
   const [sheet, setSheet] = useState<WaiterTable | null>(null);
 
-  const [layout, setLayout] = useState<"list" | "plan">("list");
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<State | "all">("all");
   const [filterOpen, setFilterOpen] = useState(false);
@@ -150,7 +155,7 @@ export function WaiterTables({
         </div>
         <FullscreenButton />
         <button onClick={onLogout} className="wt-logout">
-          Chiqish <span aria-hidden>⇥</span>
+          Chiqish <LogOut size={15} strokeWidth={2.2} />
         </button>
       </header>
 
@@ -169,7 +174,7 @@ export function WaiterTables({
                   style={on ? { borderColor: st.color } : undefined}
                 >
                   <span className="wt-stat__dot" style={{ background: `${st.color}22`, color: st.color }}>
-                    {st.icon}
+                    <st.Icon size={15} strokeWidth={2.2} />
                   </span>
                   <span className="wt-stat__body">
                     <b>{counts[k]}</b>
@@ -182,34 +187,22 @@ export function WaiterTables({
 
           {/* Ko'rinish, qidiruv, filtr */}
           <div className="wt-toolbar">
-            <div className="wt-seg">
-              <button
-                onClick={() => setLayout("plan")}
-                className={layout === "plan" ? "is-on" : ""}
-              >
-                Zal rejasi
-              </button>
-              <button
-                onClick={() => setLayout("list")}
-                className={layout === "list" ? "is-on" : ""}
-              >
-                Ro&apos;yxat
-              </button>
-            </div>
-
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Stol qidirish..."
-              className="wt-search"
-              inputMode="search"
-            />
+            <label className="wt-search">
+              <Search size={16} strokeWidth={2.2} />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Stol qidirish..."
+                inputMode="search"
+              />
+            </label>
 
             <button
               onClick={() => setFilterOpen((v) => !v)}
               className={`wt-filter ${filter !== "all" ? "is-on" : ""}`}
+              aria-label="Filtr"
             >
-              Filtr
+              <SlidersHorizontal size={17} strokeWidth={2.2} />
             </button>
           </div>
 
@@ -240,11 +233,9 @@ export function WaiterTables({
           <main className="di-list">
             {visible.length === 0 ? (
               <div className="di-empty">
-                <div className="di-empty__icon">🪑</div>
+                <div className="di-empty__icon"><Armchair size={34} strokeWidth={1.6} /></div>
                 <p>{tables.length === 0 ? "Stol biriktirilmagan" : "Topilmadi"}</p>
               </div>
-            ) : layout === "plan" ? (
-              <TableGrid tables={visible} onSelect={openTable} />
             ) : (
               <div className="wt-grid">
                 {visible.map((t) => (
@@ -264,25 +255,37 @@ export function WaiterTables({
 
       {tab === "orders" && <MyWaiterOrders />}
       {tab === "reports" && <WaiterReports me={me} />}
-      {tab === "settings" && <WaiterSettings me={me} onLogout={onLogout} />}
 
-      {/* Pastki menyu */}
+      {/* Pastki menyu — Stollar o'rtada, ko'tarilgan doirada.
+          U eng ko'p ishlatiladigan bo'lim, shuning uchun barmoq
+          uchun eng qulay joyda turadi. */}
       <nav className="wt-nav">
-        {([
-          ["tables", "Stollar", "\u{1FA91}"],
-          ["orders", "Buyurtmalar", "\u{1F4CB}"],
-          ["reports", "Hisobotlar", "\u{1F4CA}"],
-          ["settings", "Sozlamalar", "\u2699\uFE0F"],
-        ] as const).map(([k, label, icon]) => (
-          <button
-            key={k}
-            onClick={() => setTab(k)}
-            className={`wt-nav__item ${tab === k ? "is-on" : ""}`}
-          >
-            <span className="wt-nav__icon">{icon}</span>
-            <span>{label}</span>
-          </button>
-        ))}
+        <button
+          onClick={() => setTab("orders")}
+          className={`wt-nav__item ${tab === "orders" ? "is-on" : ""}`}
+        >
+          <ClipboardList size={21} strokeWidth={2} />
+          <span>Buyurtmalar</span>
+        </button>
+
+        <button
+          onClick={() => setTab("tables")}
+          className={`wt-nav__center ${tab === "tables" ? "is-on" : ""}`}
+          aria-label="Stollar"
+        >
+          <span className="wt-nav__disc">
+            <Armchair size={24} strokeWidth={2} />
+          </span>
+          <span>Stollar</span>
+        </button>
+
+        <button
+          onClick={() => setTab("reports")}
+          className={`wt-nav__item ${tab === "reports" ? "is-on" : ""}`}
+        >
+          <BarChart3 size={21} strokeWidth={2} />
+          <span>Hisobotlar</span>
+        </button>
       </nav>
 
       {sheet && (
@@ -323,7 +326,7 @@ function TableCard({
           <i /> {st.label.toUpperCase()}
         </span>
         <button onClick={onMenu} className="wt-card__more" aria-label="Batafsil">
-          ⋮
+          <MoreVertical size={16} strokeWidth={2.2} />
         </button>
       </div>
 
@@ -344,15 +347,17 @@ function TableCard({
       <div className="wt-card__name">{t.tableName || `Stol ${t.tableNumber}`}</div>
 
       <div className="wt-card__meta">
-        <span>👥 {guests} / {capacity}</span>
-        <span>🕐 {openedAt(t)}</span>
+        <span><Users size={13} strokeWidth={2.2} /> {guests} / {capacity}</span>
+        <span><Clock size={13} strokeWidth={2.2} /> {openedAt(t)}</span>
       </div>
 
       <div className="wt-card__sum">{som(t.orderTotal || 0)}</div>
 
       <button onClick={onOpen} className="wt-card__cta" disabled={state === "closed"}>
         <span>{st.action}</span>
-        <span aria-hidden>{state === "free" ? "+" : "›"}</span>
+        {state === "free"
+          ? <Plus size={15} strokeWidth={2.6} />
+          : <ChevronRight size={15} strokeWidth={2.6} />}
       </button>
     </article>
   );
@@ -403,43 +408,6 @@ function WaiterReports({ me }: { me: Me }) {
           Xizmat haqi faqat ofitsiant qabul qilgan buyurtmalarga
           qo&apos;llanadi. To&apos;lov restoran tomonidan amalga oshiriladi.
         </p>
-      </div>
-    </main>
-  );
-}
-
-/** Sozlamalar — akkaunt va qurilma. */
-function WaiterSettings({ me, onLogout }: { me: Me; onLogout: () => void }) {
-  return (
-    <main className="di-list">
-      <div className="wt-set">
-        <div className="wt-set__head">
-          <span className="wt-set__ava">
-            {me.firstName?.[0]}{me.lastName?.[0]}
-          </span>
-          <div>
-            <b>{me.firstName} {me.lastName}</b>
-            <small>{me.restaurant.name}</small>
-          </div>
-        </div>
-
-        <div className="wt-set__rows">
-          <div className="wt-set__row">
-            <span>Qurilma</span>
-            <b>Shu brauzerga bog&apos;langan</b>
-          </div>
-          <div className="wt-set__row">
-            <span>Buyurtmalar</span>
-            <b>{me.earnings?.orders ?? 0}</b>
-          </div>
-        </div>
-
-        <p className="wt-set__note">
-          Qurilmani almashtirish uchun restoran administratoriga
-          murojaat qiling — akkaunt bitta qurilmaga bog&apos;lanadi.
-        </p>
-
-        <button onClick={onLogout} className="wt-set__out">Chiqish</button>
       </div>
     </main>
   );

@@ -1423,7 +1423,22 @@ html.app-locked:has(.di-sheet) .di-page { overflow: hidden; }
 
 /* Pastki menyu bor — kontentga joy qoldiramiz */
 .wt-app .di-list { padding-bottom: 8px; }
+.wt-app .di-empty__icon { display: flex; justify-content: center; color: var(--di-muted); }
 .wt-app { padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px)) !important; }
+
+/* Chiqish tugmasi — matni ikkinchi qatorga tushmasin */
+.wt-logout {
+  display: inline-flex; align-items: center; gap: 6px;
+  flex: none;
+  padding: 7px 11px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--di-line);
+  color: var(--di-ink);
+  font-size: 13px; font-weight: 600;
+  white-space: nowrap;
+}
+.wt-logout:active { background: rgba(255, 255, 255, 0.12); }
 
 /* ─── Holat jamlanmasi ─── */
 .wt-stats {
@@ -1462,40 +1477,35 @@ html.app-locked:has(.di-sheet) .di-page { overflow: hidden; }
   display: flex; align-items: center; gap: 8px;
   padding: 8px 16px;
 }
-.wt-seg {
-  display: flex; flex: none;
-  padding: 3px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.06);
-}
-.wt-seg button {
-  padding: 6px 10px;
-  border-radius: 9px;
-  font-size: 12.5px; font-weight: 600;
-  color: var(--di-muted);
-  white-space: nowrap;
-}
-.wt-seg button.is-on { background: var(--di-surface); color: var(--di-brand); }
 
+/* Qidiruv butun bo'sh joyni egallaydi */
 .wt-search {
   flex: 1; min-width: 0;
-  padding: 9px 12px;
-  border-radius: 12px;
-  background: var(--di-surface);
-  border: 1px solid var(--di-line);
-  color: var(--di-ink);
-  font-size: 13px;
-}
-.wt-search::placeholder { color: var(--di-muted); }
-
-.wt-filter {
-  flex: none;
-  padding: 9px 13px;
-  border-radius: 12px;
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 12px;
+  height: 40px;
+  border-radius: 13px;
   background: var(--di-surface);
   border: 1px solid var(--di-line);
   color: var(--di-muted);
-  font-size: 12.5px; font-weight: 600;
+}
+.wt-search:focus-within { border-color: var(--di-brand); }
+.wt-search input {
+  flex: 1; min-width: 0;
+  background: none; border: 0; outline: none;
+  color: var(--di-ink);
+  font-size: 14px;
+}
+.wt-search input::placeholder { color: var(--di-muted); }
+
+.wt-filter {
+  width: 40px; height: 40px;
+  flex: none;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 13px;
+  background: var(--di-surface);
+  border: 1px solid var(--di-line);
+  color: var(--di-muted);
 }
 .wt-filter.is-on { border-color: var(--di-brand); color: var(--di-brand); }
 
@@ -1600,6 +1610,7 @@ html.app-locked:has(.di-sheet) .di-page { overflow: hidden; }
   margin-bottom: 6px;
 }
 .wt-card__meta span {
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
   padding: 6px 4px;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.04);
@@ -1618,14 +1629,14 @@ html.app-locked:has(.di-sheet) .di-page { overflow: hidden; }
 }
 
 .wt-card__cta {
-  display: flex; align-items: center; justify-content: center; gap: 5px;
+  display: flex; align-items: center; justify-content: center; gap: 3px;
   width: 100%;
-  padding: 9px 6px;
+  padding: 9px 4px;
   border-radius: 11px;
   border: 1px solid color-mix(in srgb, var(--c) 55%, transparent);
   background: color-mix(in srgb, var(--c) 10%, transparent);
   color: var(--c);
-  font-size: 11.5px; font-weight: 600;
+  font-size: 11px; font-weight: 600; letter-spacing: -0.01em;
   white-space: nowrap;
   overflow: hidden;
 }
@@ -1638,23 +1649,66 @@ html.app-locked:has(.di-sheet) .di-page { overflow: hidden; }
   position: fixed;
   left: 0; right: 0; bottom: 0;
   z-index: 30;
-  display: flex;
+  display: flex; align-items: flex-end;
   padding-bottom: env(safe-area-inset-bottom, 0px);
   background: rgba(20, 17, 15, 0.92);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border-top: 1px solid var(--di-line);
 }
+
 .wt-nav__item {
   flex: 1 1 0;
   min-width: 0;
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  padding: 9px 2px 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 10px 2px 9px;
   color: var(--di-muted);
-  font-size: 10.5px; font-weight: 500;
+  font-size: 11px; font-weight: 500;
+  transition: color 0.2s ease;
 }
 .wt-nav__item.is-on { color: var(--di-brand); }
-.wt-nav__icon { font-size: 17px; line-height: 1; }
+
+/* O'rtadagi tugma — panel tepasiga chiqib turadi */
+.wt-nav__center {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 0 2px 9px;
+  margin-top: -22px;
+  color: var(--di-brand);
+  font-size: 11px; font-weight: 600;
+}
+
+/* 3D doira: yuqoridan yorug'lik tushgandek gradient,
+   ichki nur va tashqi soya bilan hajm beriladi */
+.wt-nav__disc {
+  width: 54px; height: 54px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 999px;
+  color: #2C1400;
+  background:
+    radial-gradient(circle at 50% 22%, #FFD98A 0%, #F5A524 46%, #C9761A 100%);
+  box-shadow:
+    0 0 0 5px rgba(20, 17, 15, 0.95),
+    inset 0 2px 3px rgba(255, 255, 255, 0.65),
+    inset 0 -3px 6px rgba(120, 60, 0, 0.4),
+    0 8px 18px rgba(245, 165, 36, 0.35),
+    0 3px 6px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.wt-nav__center:active .wt-nav__disc { transform: scale(0.92); }
+
+/* Faol emas — so'niq turadi, lekin shakli saqlanadi */
+.wt-nav__center:not(.is-on) { color: var(--di-muted); }
+.wt-nav__center:not(.is-on) .wt-nav__disc {
+  background: radial-gradient(circle at 50% 22%, #6B5B4B 0%, #4A3D31 55%, #332A22 100%);
+  color: #C9B79F;
+  box-shadow:
+    0 0 0 5px rgba(20, 17, 15, 0.95),
+    inset 0 2px 3px rgba(255, 255, 255, 0.18),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.35),
+    0 3px 8px rgba(0, 0, 0, 0.45);
+}
 
 /* ─── Hisobotlar ─── */
 .wt-report { display: flex; flex-direction: column; gap: 12px; }
