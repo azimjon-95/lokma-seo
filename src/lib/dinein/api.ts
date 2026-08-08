@@ -43,12 +43,15 @@ async function request<T>(path: string, opts: FetchOpts = {}): Promise<T> {
   }
 
   if (!res.ok) {
-    const err = data as { error?: string; code?: string } | null;
-    throw new ApiError(
-      err?.error || "Xatolik yuz berdi",
-      res.status,
-      err?.code,
-    );
+    const err = data as { error?: string; code?: string; message?: string } | null;
+
+    // Server 500 da qisqa "Server xatosi" beradi, haqiqiy sabab
+    // esa `message` da keladi. Ofitsiant nosozlikni ayta olishi
+    // uchun ikkalasini birga ko'rsatamiz.
+    const base = err?.error || "Xatolik yuz berdi";
+    const detail = err?.message && err.message !== base ? ` — ${err.message}` : "";
+
+    throw new ApiError(base + detail, res.status, err?.code);
   }
 
   return data as T;

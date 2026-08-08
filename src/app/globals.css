@@ -1786,3 +1786,20 @@ html.app-locked:has(.di-sheet) .di-page { overflow: hidden; }
   color: #FF7A70;
   font-size: 14.5px; font-weight: 600;
 }
+
+/* ═══════════════════════════════════════════
+   iOS: maydonga bosilganda ekran yaqinlashmasin
+
+   Safari font-size 16px dan kichik bo'lgan maydonga fokus
+   tushganda sahifani avtomatik kattalashtiradi. Bu to'liq
+   ekran rejimini buzadi va qaytib chiqmaydi.
+   Yagona ishonchli yechim — 16px dan kichik qilmaslik.
+   (maximum-scale bilan to'xtatish mumkin edi, lekin u
+   ko'rish qobiliyati past foydalanuvchilarga zarar beradi.)
+   ═══════════════════════════════════════════ */
+input,
+textarea,
+select {
+  font-size: 16px;
+}
+.wt-search input { font-size: 16px; }
