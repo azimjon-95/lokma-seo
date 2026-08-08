@@ -133,7 +133,7 @@ export interface WaiterTable {
   shape?: string;
   x?: number;
   y?: number;
-  session?: { _id: string } | null;
+  session?: { _id: string; createdAt?: string; guestCount?: number } | null;
   activeOrders?: Array<{ _id: string; total: number; status: string; dineInNumber: string }>;
 }
 

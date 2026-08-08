@@ -1416,3 +1416,319 @@ html.app-locked .di-page {
    Oynalar body.style.overflow ni o'zgartiradi, lekin endi
    suriluvchi maydon .di-page — shuning uchun uni ham qulflaymiz. */
 html.app-locked:has(.di-sheet) .di-page { overflow: hidden; }
+
+/* ═══════════════════════════════════════════
+   Ofitsiant — stollar ekrani
+   ═══════════════════════════════════════════ */
+
+/* Pastki menyu bor — kontentga joy qoldiramiz */
+.wt-app .di-list { padding-bottom: 8px; }
+.wt-app { padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px)) !important; }
+
+/* ─── Holat jamlanmasi ─── */
+.wt-stats {
+  display: flex; gap: 8px;
+  padding: 10px 16px 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.wt-stats::-webkit-scrollbar { display: none; }
+
+.wt-stat {
+  flex: none;
+  display: flex; align-items: center; gap: 7px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: var(--di-surface);
+  border: 1px solid var(--di-line);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.wt-stat:active { transform: scale(0.97); }
+.wt-stat.is-on { background: rgba(255, 255, 255, 0.05); }
+
+.wt-stat__dot {
+  width: 27px; height: 27px;
+  flex: none;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 999px;
+  font-size: 14px;
+}
+.wt-stat__body { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; }
+.wt-stat__body b { font-size: 17px; font-weight: 700; color: var(--di-ink); }
+.wt-stat__body small { font-size: 11px; white-space: nowrap; }
+
+/* ─── Asboblar qatori ─── */
+.wt-toolbar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 16px;
+}
+.wt-seg {
+  display: flex; flex: none;
+  padding: 3px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+}
+.wt-seg button {
+  padding: 6px 10px;
+  border-radius: 9px;
+  font-size: 12.5px; font-weight: 600;
+  color: var(--di-muted);
+  white-space: nowrap;
+}
+.wt-seg button.is-on { background: var(--di-surface); color: var(--di-brand); }
+
+.wt-search {
+  flex: 1; min-width: 0;
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: var(--di-surface);
+  border: 1px solid var(--di-line);
+  color: var(--di-ink);
+  font-size: 13px;
+}
+.wt-search::placeholder { color: var(--di-muted); }
+
+.wt-filter {
+  flex: none;
+  padding: 9px 13px;
+  border-radius: 12px;
+  background: var(--di-surface);
+  border: 1px solid var(--di-line);
+  color: var(--di-muted);
+  font-size: 12.5px; font-weight: 600;
+}
+.wt-filter.is-on { border-color: var(--di-brand); color: var(--di-brand); }
+
+.wt-chips {
+  display: flex; gap: 7px;
+  padding: 0 16px 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.wt-chips::-webkit-scrollbar { display: none; }
+.wt-chips button {
+  flex: none;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--di-surface);
+  border: 1px solid var(--di-line);
+  color: var(--di-muted);
+  font-size: 12.5px; font-weight: 600;
+  white-space: nowrap;
+}
+.wt-chips button.is-on { border-color: transparent; }
+
+/* ─── Stol kartalari: qatorda IKKITA ─── */
+.wt-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.wt-card {
+  display: flex; flex-direction: column;
+  padding: 10px;
+  border-radius: 18px;
+  background: var(--di-surface);
+  border: 1px solid color-mix(in srgb, var(--c) 30%, transparent);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+}
+
+.wt-card__top {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 6px;
+}
+.wt-card__badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  min-width: 0;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--c) 18%, transparent);
+  color: var(--c);
+  font-size: 9.5px; font-weight: 800; letter-spacing: 0.03em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.wt-card__badge i {
+  width: 5px; height: 5px; flex: none;
+  border-radius: 999px;
+  background: var(--c);
+}
+.wt-card__more {
+  width: 24px; height: 24px; flex: none;
+  border-radius: 8px;
+  color: var(--di-muted);
+  font-size: 15px; line-height: 1;
+}
+.wt-card__more:active { background: rgba(255, 255, 255, 0.08); }
+
+/* Stol chizmasi */
+.wt-card__plan { display: flex; justify-content: center; padding: 14px 0 10px; }
+.wt-card__seats { position: relative; width: 96px; height: 96px; }
+.wt-card__disc {
+  position: absolute; inset: 16px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 999px;
+  background: radial-gradient(circle at 34% 28%, #8A6A4E, #5A4331 70%);
+  border: 2px solid var(--c);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--c) 40%, transparent);
+  color: #fff; font-size: 22px; font-weight: 700;
+}
+.wt-seat {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 13px; height: 16px;
+  margin: -8px 0 0 -6.5px;
+  border-radius: 6px 6px 4px 4px;
+  background: #3B2E23;
+  transform-origin: center;
+}
+.wt-seat.is-taken {
+  background: linear-gradient(#E4A455, #C07E30);
+  box-shadow: 0 0 9px rgba(245, 165, 36, 0.5);
+}
+
+.wt-card__name {
+  text-align: center;
+  font-size: 14.5px; font-weight: 600;
+  color: var(--di-ink);
+  margin-bottom: 8px;
+}
+
+.wt-card__meta {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.wt-card__meta span {
+  padding: 6px 4px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--di-line);
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--di-muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.wt-card__sum {
+  text-align: center;
+  font-size: 13.5px; font-weight: 700;
+  color: var(--c);
+  margin-bottom: 9px;
+}
+
+.wt-card__cta {
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  width: 100%;
+  padding: 9px 6px;
+  border-radius: 11px;
+  border: 1px solid color-mix(in srgb, var(--c) 55%, transparent);
+  background: color-mix(in srgb, var(--c) 10%, transparent);
+  color: var(--c);
+  font-size: 11.5px; font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.wt-card__cta > :first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.wt-card__cta:disabled { opacity: 0.45; }
+.wt-card__cta:active:not(:disabled) { background: color-mix(in srgb, var(--c) 20%, transparent); }
+
+/* ─── Pastki menyu ─── */
+.wt-nav {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 30;
+  display: flex;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: rgba(20, 17, 15, 0.92);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-top: 1px solid var(--di-line);
+}
+.wt-nav__item {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 9px 2px 8px;
+  color: var(--di-muted);
+  font-size: 10.5px; font-weight: 500;
+}
+.wt-nav__item.is-on { color: var(--di-brand); }
+.wt-nav__icon { font-size: 17px; line-height: 1; }
+
+/* ─── Hisobotlar ─── */
+.wt-report { display: flex; flex-direction: column; gap: 12px; }
+.wt-report__big {
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 18px;
+  border-radius: 18px;
+  background: linear-gradient(140deg, rgba(245, 165, 36, 0.14), var(--di-surface));
+  border: 1px solid rgba(245, 165, 36, 0.28);
+}
+.wt-report__big small { font-size: 12px; color: var(--di-muted); }
+.wt-report__big b { font-size: 27px; font-weight: 700; color: var(--di-brand); }
+.wt-report__big span { font-size: 12px; color: var(--di-muted); }
+
+.wt-report__rows {
+  border-radius: 16px;
+  background: var(--di-surface);
+  border: 1px solid var(--di-line);
+  overflow: hidden;
+}
+.wt-report__row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  padding: 13px 14px;
+  font-size: 13.5px;
+  color: var(--di-muted);
+}
+.wt-report__row + .wt-report__row { border-top: 1px solid var(--di-line); }
+.wt-report__row b { color: var(--di-ink); font-weight: 600; }
+.wt-report__note { font-size: 12px; line-height: 1.5; color: var(--di-muted); padding: 0 2px; }
+
+/* ─── Sozlamalar ─── */
+.wt-set { display: flex; flex-direction: column; gap: 12px; }
+.wt-set__head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px;
+  border-radius: 18px;
+  background: var(--di-surface);
+  border: 1px solid var(--di-line);
+}
+.wt-set__ava {
+  width: 46px; height: 46px; flex: none;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 999px;
+  background: rgba(245, 165, 36, 0.16);
+  color: var(--di-brand);
+  font-size: 16px; font-weight: 700;
+  text-transform: uppercase;
+}
+.wt-set__head b { display: block; font-size: 15.5px; color: var(--di-ink); }
+.wt-set__head small { font-size: 12.5px; color: var(--di-muted); }
+
+.wt-set__rows {
+  border-radius: 16px;
+  background: var(--di-surface);
+  border: 1px solid var(--di-line);
+  overflow: hidden;
+}
+.wt-set__row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  padding: 13px 14px;
+  font-size: 13.5px;
+  color: var(--di-muted);
+}
+.wt-set__row + .wt-set__row { border-top: 1px solid var(--di-line); }
+.wt-set__row b { color: var(--di-ink); font-weight: 500; font-size: 13px; text-align: right; }
+.wt-set__note { font-size: 12px; line-height: 1.5; color: var(--di-muted); padding: 0 2px; }
+
+.wt-set__out {
+  padding: 13px;
+  border-radius: 14px;
+  background: rgba(225, 75, 66, 0.12);
+  border: 1px solid rgba(225, 75, 66, 0.4);
+  color: #FF7A70;
+  font-size: 14.5px; font-weight: 600;
+}

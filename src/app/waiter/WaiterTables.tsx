@@ -33,6 +33,45 @@ const TABLE_STATUS: Record<string, string> = {
   closed: "Yopiq",
 };
 
+/* ═══════════════════════════════════════════
+   Stol holatlari
+
+   Bazadagi status (available/occupied/ordering/waiting/closed)
+   ofitsiant uchun tushunarli beshta holatga keltiriladi.
+   "Hisob so'ralgan" alohida: u stol statusi emas, mijozning
+   so'rovi (TableRequest type='bill').
+   ═══════════════════════════════════════════ */
+type State = "free" | "pending" | "busy" | "bill" | "closed";
+
+const STATE: Record<State, {
+  label: string; color: string; icon: string; action: string;
+}> = {
+  free:    { label: "Bo'sh",           color: "#34C759", icon: "\u{1FA91}", action: "Stolni ochish" },
+  pending: { label: "Kutilmoqda",      color: "#F5A524", icon: "\u23F1",    action: "Buyurtmani ko'rish" },
+  busy:    { label: "Band",            color: "#E14B42", icon: "\u{1F465}", action: "Buyurtmani ko'rish" },
+  bill:    { label: "Hisob so'ralgan", color: "#3B82F6", icon: "\u{1F9FE}", action: "Hisob chiqarish" },
+  closed:  { label: "Yopilgan",        color: "#8E8E93", icon: "\u2716",    action: "Yopiq" },
+};
+
+const ORDER: State[] = ["free", "pending", "busy", "bill", "closed"];
+
+function stateOf(t: WaiterTable, billTables: Set<string>): State {
+  if (billTables.has(t._id)) return "bill";
+  if (t.status === "closed") return "closed";
+  if (t.status === "ordering" || t.status === "waiting") return "pending";
+  if (t.isBusy || t.status === "occupied" || (t.guestCount || 0) > 0) return "busy";
+  return "free";
+}
+
+/** Stol qachon ochilgani — "18:42". */
+function openedAt(t: WaiterTable) {
+  const iso = t.session?.createdAt;
+  if (!iso) return "\u2013";
+  return new Date(iso).toLocaleTimeString("ru-RU", {
+    hour: "2-digit", minute: "2-digit",
+  });
+}
+
 export function WaiterTables({
   me, tables, onRefresh, onLogout,
 }: {
@@ -42,14 +81,48 @@ export function WaiterTables({
   onLogout: () => void;
 }) {
   const [active, setActive] = useState<WaiterTable | null>(null);
-  const [view, setView] = useState<"tables" | "orders">("tables");
+  const [tab, setTab] = useState<"tables" | "orders" | "reports" | "settings">("tables");
   const [sheet, setSheet] = useState<WaiterTable | null>(null);
+
+  const [layout, setLayout] = useState<"list" | "plan">("list");
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState<State | "all">("all");
+  const [filterOpen, setFilterOpen] = useState(false);
+
+  // Hisob so'ragan stollar — TableRequest'dan
+  const [billTables, setBillTables] = useState<Set<string>>(new Set());
+
+  const loadRequests = useCallback(async () => {
+    try {
+      const list = await waiterApi.requests();
+      const ids = list
+        .filter((r) => r.type === "bill" && r.status !== "done")
+        .map((r) => (r.tableId as unknown as { _id?: string })?._id)
+        .filter(Boolean) as string[];
+      setBillTables(new Set(ids));
+    } catch {
+      /* so'rovlar yuklanmasa ham stollar ko'rinadi */
+    }
+  }, []);
 
   // Stollar holati — 30 soniyada yangilanadi
   useEffect(() => {
-    const timer = setInterval(onRefresh, 30000);
+    loadRequests();
+    const timer = setInterval(() => { onRefresh(); loadRequests(); }, 30000);
     return () => clearInterval(timer);
-  }, [onRefresh]);
+  }, [onRefresh, loadRequests]);
+
+  const counts = ORDER.reduce((acc, k) => {
+    acc[k] = tables.filter((t) => stateOf(t, billTables) === k).length;
+    return acc;
+  }, {} as Record<State, number>);
+
+  const visible = tables.filter((t) => {
+    if (filter !== "all" && stateOf(t, billTables) !== filter) return false;
+    if (!query.trim()) return true;
+    const q = query.trim().toLowerCase();
+    return `${t.tableNumber} ${t.tableName || ""}`.toLowerCase().includes(q);
+  });
 
   if (active) {
     return (
@@ -61,61 +134,162 @@ export function WaiterTables({
     );
   }
 
+  const openTable = (t: WaiterTable) => {
+    if (stateOf(t, billTables) === "free") setActive(t);
+    else setSheet(t);
+  };
+
   return (
-    <div className="di-page">
+    <div className="di-page wt-app">
       <header className="di-header">
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <div className="di-header__rest">{me.restaurant.name}</div>
           <div className="di-header__table">
             {me.firstName} {me.lastName}
           </div>
         </div>
         <FullscreenButton />
-        <button onClick={onLogout} className="wt-logout">Chiqish</button>
+        <button onClick={onLogout} className="wt-logout">
+          Chiqish <span aria-hidden>⇥</span>
+        </button>
       </header>
 
-      {/* Bo'limlar */}
-      <div className="wt-tabs">
-        <button onClick={() => setView("tables")}
-          className={`wt-tab ${view === "tables" ? "is-active" : ""}`}>
-          Stollar
-        </button>
-        <button onClick={() => setView("orders")}
-          className={`wt-tab ${view === "orders" ? "is-active" : ""}`}>
-          Buyurtmalarim
-        </button>
-      </div>
-
-      {view === "orders" ? (
-        <MyWaiterOrders />
-      ) : (
+      {tab === "tables" && (
         <>
-      {/* Chaqiruvlar */}
-      <WaiterRequests onDone={onRefresh} />
-
-      {me.earnings && me.earnings.total > 0 && (
-        <div className="wt-earnings">
-          <span>Daromadingiz</span>
-          <b>{som(me.earnings.total)}</b>
-          <span className="wt-earnings__sub">{me.earnings.orders} buyurtma</span>
-        </div>
-      )}
-      <main className="di-list">
-        {tables.length === 0 ? (
-          <div className="di-empty">
-            <div className="di-empty__icon">🪑</div>
-            <p>Stol biriktirilmagan</p>
+          {/* Holat bo'yicha jamlanma — bosilsa filtrlaydi */}
+          <div className="wt-stats">
+            {ORDER.map((k) => {
+              const st = STATE[k];
+              const on = filter === k;
+              return (
+                <button
+                  key={k}
+                  onClick={() => setFilter(on ? "all" : k)}
+                  className={`wt-stat ${on ? "is-on" : ""}`}
+                  style={on ? { borderColor: st.color } : undefined}
+                >
+                  <span className="wt-stat__dot" style={{ background: `${st.color}22`, color: st.color }}>
+                    {st.icon}
+                  </span>
+                  <span className="wt-stat__body">
+                    <b>{counts[k]}</b>
+                    <small style={{ color: st.color }}>{st.label}</small>
+                  </span>
+                </button>
+              );
+            })}
           </div>
-        ) : (
-          <TableGrid tables={tables} onSelect={setSheet} />
-        )}
-      </main>
+
+          {/* Ko'rinish, qidiruv, filtr */}
+          <div className="wt-toolbar">
+            <div className="wt-seg">
+              <button
+                onClick={() => setLayout("plan")}
+                className={layout === "plan" ? "is-on" : ""}
+              >
+                Zal rejasi
+              </button>
+              <button
+                onClick={() => setLayout("list")}
+                className={layout === "list" ? "is-on" : ""}
+              >
+                Ro&apos;yxat
+              </button>
+            </div>
+
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Stol qidirish..."
+              className="wt-search"
+              inputMode="search"
+            />
+
+            <button
+              onClick={() => setFilterOpen((v) => !v)}
+              className={`wt-filter ${filter !== "all" ? "is-on" : ""}`}
+            >
+              Filtr
+            </button>
+          </div>
+
+          {filterOpen && (
+            <div className="wt-chips">
+              <button
+                onClick={() => { setFilter("all"); setFilterOpen(false); }}
+                className={filter === "all" ? "is-on" : ""}
+              >
+                Hammasi
+              </button>
+              {ORDER.map((k) => (
+                <button
+                  key={k}
+                  onClick={() => { setFilter(k); setFilterOpen(false); }}
+                  className={filter === k ? "is-on" : ""}
+                  style={filter === k ? { background: STATE[k].color, color: "#0F0C0A" } : undefined}
+                >
+                  {STATE[k].label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Chaqiruvlar */}
+          <WaiterRequests onDone={() => { onRefresh(); loadRequests(); }} />
+
+          <main className="di-list">
+            {visible.length === 0 ? (
+              <div className="di-empty">
+                <div className="di-empty__icon">🪑</div>
+                <p>{tables.length === 0 ? "Stol biriktirilmagan" : "Topilmadi"}</p>
+              </div>
+            ) : layout === "plan" ? (
+              <TableGrid tables={visible} onSelect={openTable} />
+            ) : (
+              <div className="wt-grid">
+                {visible.map((t) => (
+                  <TableCard
+                    key={t._id}
+                    table={t}
+                    state={stateOf(t, billTables)}
+                    onOpen={() => openTable(t)}
+                    onMenu={() => setSheet(t)}
+                  />
+                ))}
+              </div>
+            )}
+          </main>
+        </>
+      )}
+
+      {tab === "orders" && <MyWaiterOrders />}
+      {tab === "reports" && <WaiterReports me={me} />}
+      {tab === "settings" && <WaiterSettings me={me} onLogout={onLogout} />}
+
+      {/* Pastki menyu */}
+      <nav className="wt-nav">
+        {([
+          ["tables", "Stollar", "\u{1FA91}"],
+          ["orders", "Buyurtmalar", "\u{1F4CB}"],
+          ["reports", "Hisobotlar", "\u{1F4CA}"],
+          ["settings", "Sozlamalar", "\u2699\uFE0F"],
+        ] as const).map(([k, label, icon]) => (
+          <button
+            key={k}
+            onClick={() => setTab(k)}
+            className={`wt-nav__item ${tab === k ? "is-on" : ""}`}
+          >
+            <span className="wt-nav__icon">{icon}</span>
+            <span>{label}</span>
+          </button>
+        ))}
+      </nav>
 
       {sheet && (
         <TableSheet
           table={sheet}
           onClose={() => setSheet(null)}
-          onRefresh={onRefresh}
+          onRefresh={() => { onRefresh(); loadRequests(); }}
           onNewOrder={() => {
             const t = sheet;
             setSheet(null);
@@ -123,9 +297,151 @@ export function WaiterTables({
           }}
         />
       )}
-        </>
-      )}
     </div>
+  );
+}
+
+/** Stol kartasi — ro'yxat ko'rinishida. */
+function TableCard({
+  table: t, state, onOpen, onMenu,
+}: {
+  table: WaiterTable;
+  state: State;
+  onOpen: () => void;
+  onMenu: () => void;
+}) {
+  const st = STATE[state];
+  const capacity = t.capacity || 4;
+  const guests = t.guestCount || 0;
+  // Sig'imdan ko'p mehmon kelsa stul qo'shiladi
+  const seats = Math.min(14, Math.max(2, capacity, guests));
+
+  return (
+    <article className="wt-card" style={{ ["--c" as string]: st.color }}>
+      <div className="wt-card__top">
+        <span className="wt-card__badge">
+          <i /> {st.label.toUpperCase()}
+        </span>
+        <button onClick={onMenu} className="wt-card__more" aria-label="Batafsil">
+          ⋮
+        </button>
+      </div>
+
+      {/* Stol chizmasi */}
+      <div className="wt-card__plan">
+        <div className="wt-card__seats">
+          {Array.from({ length: seats }).map((_, i) => (
+            <span
+              key={i}
+              className={`wt-seat ${i < guests ? "is-taken" : ""}`}
+              style={{ transform: `rotate(${(i / seats) * 360 - 90}deg) translateY(-44px)` }}
+            />
+          ))}
+          <span className="wt-card__disc">{t.tableNumber}</span>
+        </div>
+      </div>
+
+      <div className="wt-card__name">{t.tableName || `Stol ${t.tableNumber}`}</div>
+
+      <div className="wt-card__meta">
+        <span>👥 {guests} / {capacity}</span>
+        <span>🕐 {openedAt(t)}</span>
+      </div>
+
+      <div className="wt-card__sum">{som(t.orderTotal || 0)}</div>
+
+      <button onClick={onOpen} className="wt-card__cta" disabled={state === "closed"}>
+        <span>{st.action}</span>
+        <span aria-hidden>{state === "free" ? "+" : "›"}</span>
+      </button>
+    </article>
+  );
+}
+
+/** Hisobotlar — bugungi va umumiy natija. */
+function WaiterReports({ me }: { me: Me }) {
+  const [data, setData] = useState<{
+    today: { orders: number; sales: number; serviceFee: number };
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    waiterApi.orders()
+      .then((d) => setData({ today: d.today }))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return <div className="di-loading"><div className="di-spinner" /></div>;
+  }
+
+  const rows: Array<[string, string]> = [
+    ["Bugungi buyurtmalar", String(data?.today.orders ?? 0)],
+    ["Bugungi savdo", som(data?.today.sales ?? 0)],
+    ["Bugungi xizmat haqi", som(data?.today.serviceFee ?? 0)],
+  ];
+
+  return (
+    <main className="di-list">
+      <div className="wt-report">
+        <div className="wt-report__big">
+          <small>Jami daromadingiz</small>
+          <b>{som(me.earnings?.total ?? 0)}</b>
+          <span>{me.earnings?.orders ?? 0} buyurtma</span>
+        </div>
+
+        <div className="wt-report__rows">
+          {rows.map(([k, v]) => (
+            <div key={k} className="wt-report__row">
+              <span>{k}</span><b>{v}</b>
+            </div>
+          ))}
+        </div>
+
+        <p className="wt-report__note">
+          Xizmat haqi faqat ofitsiant qabul qilgan buyurtmalarga
+          qo&apos;llanadi. To&apos;lov restoran tomonidan amalga oshiriladi.
+        </p>
+      </div>
+    </main>
+  );
+}
+
+/** Sozlamalar — akkaunt va qurilma. */
+function WaiterSettings({ me, onLogout }: { me: Me; onLogout: () => void }) {
+  return (
+    <main className="di-list">
+      <div className="wt-set">
+        <div className="wt-set__head">
+          <span className="wt-set__ava">
+            {me.firstName?.[0]}{me.lastName?.[0]}
+          </span>
+          <div>
+            <b>{me.firstName} {me.lastName}</b>
+            <small>{me.restaurant.name}</small>
+          </div>
+        </div>
+
+        <div className="wt-set__rows">
+          <div className="wt-set__row">
+            <span>Qurilma</span>
+            <b>Shu brauzerga bog&apos;langan</b>
+          </div>
+          <div className="wt-set__row">
+            <span>Buyurtmalar</span>
+            <b>{me.earnings?.orders ?? 0}</b>
+          </div>
+        </div>
+
+        <p className="wt-set__note">
+          Qurilmani almashtirish uchun restoran administratoriga
+          murojaat qiling — akkaunt bitta qurilmaga bog&apos;lanadi.
+        </p>
+
+        <button onClick={onLogout} className="wt-set__out">Chiqish</button>
+      </div>
+    </main>
   );
 }
 
