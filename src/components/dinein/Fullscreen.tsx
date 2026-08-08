@@ -94,6 +94,14 @@ export function useFullscreen() {
 export function FullscreenGate() {
   const { supported, enter } = useFullscreen();
 
+  // Sahifa emas, ichki maydon surilsin — iOS'da "rezina"
+  // effekti sarlavhani surib yuborardi va tepada oq chiziq
+  // chiqarardi. Marketing sahifasiga tegmaydi.
+  useEffect(() => {
+    document.documentElement.classList.add("app-locked");
+    return () => document.documentElement.classList.remove("app-locked");
+  }, []);
+
   useEffect(() => {
     if (!supported) return;
 

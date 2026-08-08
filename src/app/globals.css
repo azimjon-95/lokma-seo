@@ -1382,3 +1382,37 @@ body {
 .fs-hint__body span { color: var(--di-muted); font-size: 12.5px; line-height: 1.45; }
 .fs-hint__body span b { color: var(--di-brand); font-size: inherit; }
 .fs-hint > button { color: var(--di-muted); font-size: 15px; padding: 2px 4px; }
+
+/* ═══════════════════════════════════════════
+   Ilova sahifalarida sahifa emas, ichki maydon suriladi
+
+   iOS'da butun sahifa "rezina" bo'lib cho'ziladi: yuqoriga
+   tortilsa tepada oq chiziq chiqadi, sarlavha esa surilib
+   ketadi. To'liq ekranda bu ayniqsa xunuk ko'rinadi.
+
+   Yechim: html/body qotib turadi, .di-page ning o'zi suriladi.
+   Sinf FullscreenGate tomonidan qo'yiladi — marketing
+   sahifasiga (/) tegmaydi, u oddiy surilaveradi.
+   ═══════════════════════════════════════════ */
+html.app-locked,
+html.app-locked body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  /* Baribir cho'zilib ketsa oq emas, to'q fon ko'rinsin */
+  background: var(--di-bg);
+}
+
+html.app-locked .di-page {
+  height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* Ichki ro'yxat oxiriga yetganda sahifa cho'zilmasin */
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Oyna ochilganda orqadagi ro'yxat surilmasin.
+   Oynalar body.style.overflow ni o'zgartiradi, lekin endi
+   suriluvchi maydon .di-page — shuning uchun uni ham qulflaymiz. */
+html.app-locked:has(.di-sheet) .di-page { overflow: hidden; }
