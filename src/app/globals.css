@@ -72,15 +72,21 @@ body {
   min-height: 100dvh;
   background: var(--di-bg);
   color: var(--di-ink);
-  padding-bottom: 92px;
+  padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 /* ─── Sarlavha ─── */
+/* viewport-fit=cover bo'lgani uchun sahifa ekranning eng chetiga
+   qadar cho'ziladi. Sarlavha soat va "tirnoq" ostiga kirib
+   ketmasligi uchun tepadan xavfsiz zona qo'shiladi.
+   Oddiy brauzerda env() nolga teng — hech narsa o'zgarmaydi. */
 .di-header {
   position: sticky; top: 0; z-index: 20;
   display: flex; align-items: center; gap: 12px;
-  padding: 14px 16px;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 14px;
   background: rgba(20, 17, 15, 0.88);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
