@@ -7,6 +7,7 @@ import { cached } from "@/lib/dinein/cache";
 import { DishSheet } from "@/components/dinein/DishSheet";
 import { TableGrid } from "@/components/dinein/TableGrid";
 import { TableSheet } from "@/components/dinein/TableSheet";
+import { FullscreenButton } from "@/components/dinein/Fullscreen";
 
 interface Me {
   firstName: string;
@@ -69,6 +70,7 @@ export function WaiterTables({
             {me.firstName} {me.lastName}
           </div>
         </div>
+        <FullscreenButton />
         <button onClick={onLogout} className="wt-logout">Chiqish</button>
       </header>
 
@@ -178,6 +180,36 @@ function WaiterOrder({
     );
   };
 
+  /** Shu taomdan savatda nechta bor (barcha variantlari bilan). */
+  const qtyOf = (dish: Dish) =>
+    lines.reduce((n, l) => (l.dish._id === dish._id ? n + l.quantity : n), 0);
+
+  /**
+   * Taom bosilganda darhol savatga qo'shiladi — alohida sahifa
+   * ochilmaydi. Faqat majburiy variant bo'lsa oyna ochiladi,
+   * chunki tanlovsiz narxni aniqlab bo'lmaydi.
+   */
+  const tapDish = (dish: Dish) => {
+    const mustChoose = (dish.optionGroups || []).some((g) => g.required);
+    if (mustChoose) { setOpenDish(dish); return; }
+    addLine(dish, 1, []);
+  };
+
+  /** Ro'yxatdagi +/− tugmalari. */
+  const stepDish = (dish: Dish, delta: number) => {
+    if (delta > 0) { tapDish(dish); return; }
+    setLines((prev) => {
+      // Oxirgi qo'shilgan variantdan kamaytiramiz
+      for (let i = prev.length - 1; i >= 0; i--) {
+        if (prev[i].dish._id !== dish._id) continue;
+        const line = prev[i];
+        if (line.quantity <= 1) return prev.filter((_, k) => k !== i);
+        return prev.map((l, k) => (k === i ? { ...l, quantity: l.quantity - 1 } : l));
+      }
+      return prev;
+    });
+  };
+
   const subtotal = lines.reduce((s, l) => s + l.unitPrice * l.quantity, 0);
   const count = lines.reduce((s, l) => s + l.quantity, 0);
 
@@ -213,22 +245,6 @@ function WaiterOrder({
         </div>
       </header>
 
-      {/* Tanlanganlar */}
-      {lines.length > 0 && (
-        <div className="wt-selected">
-          {lines.map((l) => (
-            <div key={l.key} className="wt-selected__row">
-              <span className="wt-selected__name">{l.dish.name}</span>
-              <div className="di-qty di-qty--sm">
-                <button onClick={() => setQty(l.key, l.quantity - 1)}>−</button>
-                <span>{l.quantity}</span>
-                <button onClick={() => setQty(l.key, l.quantity + 1)}>+</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
       {sections.length > 1 && (
         <nav className="di-sections">
           <button
@@ -253,29 +269,63 @@ function WaiterOrder({
         {loading ? (
           <div className="di-loading"><div className="di-spinner" /></div>
         ) : (
-          visible.map((d) => (
-            <button key={d._id} onClick={() => setOpenDish(d)} className="di-dish">
-              {d.imageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={d.imageUrl} alt="" className="di-dish__img" loading="lazy" />
-              ) : (
-                <div className="di-dish__img di-dish__img--empty">🍽</div>
-              )}
-              <div className="di-dish__body">
-                <div className="di-dish__name">{d.name}</div>
-                <div className="di-dish__bottom">
-                  <span className="di-dish__price">{som(d.price)}</span>
+          visible.map((d) => {
+            const qty = qtyOf(d);
+            const mustChoose = (d.optionGroups || []).some((g) => g.required);
+            const hasOptions = (d.optionGroups || []).length > 0;
+
+            return (
+              <div
+                key={d._id}
+                role="button"
+                tabIndex={0}
+                onClick={() => tapDish(d)}
+                onKeyDown={(e) => { if (e.key === "Enter") tapDish(d); }}
+                className={`di-dish ${qty > 0 ? "is-picked" : ""}`}
+              >
+                {d.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={d.imageUrl} alt="" className="di-dish__img" loading="lazy" />
+                ) : (
+                  <div className="di-dish__img di-dish__img--empty">🍽</div>
+                )}
+
+                <div className="di-dish__body">
+                  <div className="di-dish__name">{d.name}</div>
+                  <div className="di-dish__bottom">
+                    <span className="di-dish__price">{som(d.price)}</span>
+                    {hasOptions && !mustChoose && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setOpenDish(d); }}
+                        className="di-dish__opts"
+                      >
+                        Variantlar
+                      </button>
+                    )}
+                  </div>
                 </div>
+
+                {qty > 0 ? (
+                  <div className="di-qty di-qty--sm" onClick={(e) => e.stopPropagation()}>
+                    <button onClick={() => stepDish(d, -1)} aria-label="Kamaytirish">−</button>
+                    <span>{qty}</span>
+                    <button onClick={() => stepDish(d, 1)} aria-label="Ko'paytirish">+</button>
+                  </div>
+                ) : (
+                  <span className="di-dish__add">+</span>
+                )}
               </div>
-              <span className="di-dish__add">+</span>
-            </button>
-          ))
+            );
+          })
         )}
       </main>
 
+      {/* Xato savat tugmasi tepasida — avval sahifa oxirida edi,
+          uzun menyu ostida qolib ofitsiantga ko'rinmasdi */}
       {error && (
-        <div style={{ padding: "0 16px 12px" }}>
-          <div className="di-error">{error}</div>
+        <div className="wt-error" role="alert">
+          <span>{error}</span>
+          <button onClick={() => setError(null)} aria-label="Yopish">✕</button>
         </div>
       )}
 
