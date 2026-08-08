@@ -3,15 +3,24 @@
 import { useState, useEffect, useCallback } from "react";
 
 /**
- * To'liq ekran rejimi — faqat ofitsiant bo'limi uchun.
+ * To'liq ekran rejimi (F11 kabi).
  *
- * Brauzer qoidasi: fullscreen'ni faqat foydalanuvchi harakatidan
- * keyin so'rash mumkin. Shuning uchun sahifa ochilganda emas,
- * birinchi bosishda so'raladi.
+ * Platformalar bo'yicha haqiqat:
+ *   • Desktop (Chrome, Firefox, Edge) — ishlaydi
+ *   • Android Chrome/Samsung — ishlaydi, brauzer paneli yashiriladi
+ *   • iPhone Safari — Element.requestFullscreen UMUMAN YO'Q.
+ *     Bu Apple cheklovi, JS bilan aylanib o'tib bo'lmaydi.
+ *     Yagona yo'l — sahifani "Bosh ekranga qo'shish" (PWA),
+ *     shunda Safari paneli chiqmaydi. IosHint shuni aytadi.
  *
- * iOS Safari'da Element.requestFullscreen yo'q — u yerda tugma
- * ko'rsatilmaydi va rejim oddiy holicha qoladi.
+ * Brauzer qoidasi: fullscreen faqat foydalanuvchi harakatidan
+ * keyin so'ralishi mumkin — sahifa ochilishida emas. Shuning
+ * uchun har bosishda tekshiramiz va kerak bo'lsa qaytaramiz.
+ *
+ * Foydalanuvchi tugma orqali chiqsa — majburlamaymiz.
  */
+
+const OPT_OUT = "lokma_fs_off";
 
 interface FsDocument extends Document {
   webkitFullscreenElement?: Element | null;
@@ -19,6 +28,11 @@ interface FsDocument extends Document {
 }
 interface FsElement extends HTMLElement {
   webkitRequestFullscreen?: () => Promise<void>;
+}
+
+function isFullscreen() {
+  const d = document as FsDocument;
+  return Boolean(d.fullscreenElement || d.webkitFullscreenElement);
 }
 
 export function useFullscreen() {
@@ -29,10 +43,7 @@ export function useFullscreen() {
     const el = document.documentElement as FsElement;
     setSupported(Boolean(el.requestFullscreen || el.webkitRequestFullscreen));
 
-    const sync = () => {
-      const d = document as FsDocument;
-      setActive(Boolean(d.fullscreenElement || d.webkitFullscreenElement));
-    };
+    const sync = () => setActive(isFullscreen());
     sync();
     document.addEventListener("fullscreenchange", sync);
     document.addEventListener("webkitfullscreenchange", sync);
@@ -63,23 +74,42 @@ export function useFullscreen() {
   }, []);
 
   const toggle = useCallback(() => {
-    if (active) exit(); else enter();
+    if (active) {
+      // Ataylab chiqdi — qaytarib turmaymiz
+      sessionStorage.setItem(OPT_OUT, "1");
+      exit();
+    } else {
+      sessionStorage.removeItem(OPT_OUT);
+      enter();
+    }
   }, [active, enter, exit]);
 
-  // Birinchi bosishda avtomatik — brauzer harakatsiz ruxsat bermaydi
+  return { active, supported, toggle, enter };
+}
+
+/**
+ * Ilova sahifalariga qo'yiladi — to'liq ekranni ushlab turadi.
+ * Ko'rinadigan hech narsa chizmaydi.
+ */
+export function FullscreenGate() {
+  const { supported, enter } = useFullscreen();
+
   useEffect(() => {
     if (!supported) return;
-    if (sessionStorage.getItem("wt_fs_asked")) return;
 
-    const once = () => {
-      sessionStorage.setItem("wt_fs_asked", "1");
+    const onTap = () => {
+      if (sessionStorage.getItem(OPT_OUT)) return;
+      if (isFullscreen()) return;
       enter();
     };
-    window.addEventListener("pointerdown", once, { once: true });
-    return () => window.removeEventListener("pointerdown", once);
+
+    // Har bosishda tekshiriladi: sahifalar orasida yurganda yoki
+    // Esc bosilganda rejim tushib qoladi, keyingi tegishda qaytadi
+    window.addEventListener("pointerdown", onTap);
+    return () => window.removeEventListener("pointerdown", onTap);
   }, [supported, enter]);
 
-  return { active, supported, toggle };
+  return <IosHint blocked={!supported} />;
 }
 
 /** Sarlavhadagi kichik tugma. */
@@ -96,5 +126,52 @@ export function FullscreenButton() {
     >
       {active ? "⤡" : "⤢"}
     </button>
+  );
+}
+
+/**
+ * iPhone'da to'liq ekran API yo'q. Yagona yo'l — bosh ekranga
+ * qo'shish. Bir marta ko'rsatiladi, yopilsa qaytmaydi.
+ */
+function IosHint({ blocked }: { blocked: boolean }) {
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    if (!blocked) return;
+
+    const ua = navigator.userAgent;
+    const isIos = /iPad|iPhone|iPod/.test(ua)
+      // iPadOS o'zini Mac deb ko'rsatadi
+      || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    if (!isIos) return;
+
+    // Allaqachon bosh ekrandan ochilgan bo'lsa kerak emas
+    const standalone = window.matchMedia("(display-mode: standalone)").matches
+      || (window.navigator as unknown as { standalone?: boolean }).standalone;
+    if (standalone) return;
+
+    if (localStorage.getItem("lokma_ios_hint")) return;
+    const timer = setTimeout(() => setShow(true), 2500);
+    return () => clearTimeout(timer);
+  }, [blocked]);
+
+  if (!show) return null;
+
+  const close = () => {
+    localStorage.setItem("lokma_ios_hint", "1");
+    setShow(false);
+  };
+
+  return (
+    <div className="fs-hint" role="note">
+      <div className="fs-hint__body">
+        <b>To&apos;liq ekranda ishlatish</b>
+        <span>
+          Pastdagi <b>Ulashish</b> tugmasi → <b>Bosh ekranga qo&apos;shish</b>.
+          Shunda ilova Safari panelisiz ochiladi.
+        </span>
+      </div>
+      <button onClick={close} aria-label="Yopish">✕</button>
+    </div>
   );
 }

@@ -3,13 +3,17 @@
   "short_name": "Lokma",
   "description": "Namangan va Toshkentdagi restoran va kafelardan ovqat yetkazib berish. Osh, shashlik, lavash, pitsa — 25-40 daqiqada.",
   "start_url": "/",
-  "display": "standalone",
+  "display": "fullscreen",
   "orientation": "portrait",
   "background_color": "#12100E",
   "theme_color": "#F5A524",
   "lang": "uz",
   "dir": "ltr",
-  "categories": ["food", "shopping", "lifestyle"],
+  "categories": [
+    "food",
+    "shopping",
+    "lifestyle"
+  ],
   "icons": [
     {
       "src": "/logo-192.png",
@@ -29,5 +33,10 @@
       "type": "image/png",
       "purpose": "maskable"
     }
+  ],
+  "display_override": [
+    "fullscreen",
+    "standalone",
+    "minimal-ui"
   ]
 }

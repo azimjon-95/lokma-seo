@@ -16,6 +16,9 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: "#F5A524",
+  // Telefon "tirnog'i" ostidagi joy ham ishlatiladi —
+  // to'liq ekranda chekkalarda oq chiziq qolmasin
+  viewportFit: "cover",
 };
 
 export const metadata: Metadata = {
