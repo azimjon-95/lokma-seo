@@ -6,7 +6,10 @@ import { useCart, toOrderItems } from "@/lib/dinein/cart";
 import type { StoredSession } from "@/lib/dinein/session";
 import { som } from "@/lib/dinein/format";
 
-/** Savat — buyurtma berish. */
+/**
+ * Savat — checklist ko'rinishida: rasm, nom, narx, miqdor,
+ * shu yerning o'zida o'zgartirish mumkin.
+ */
 export function CartSheet({
   session,
   onClose,
@@ -58,43 +61,67 @@ export function CartSheet({
 
   return (
     <div className="di-sheet" onClick={onClose}>
-      <div className="di-sheet__box" onClick={(e) => e.stopPropagation()}>
+      <div className="di-sheet__box di-cart-sheet" onClick={(e) => e.stopPropagation()}>
         <div className="di-sheet__handle" />
 
         <div className="di-sheet__head">
-          <h2 className="di-sheet__name">Savat</h2>
+          <h2 className="di-sheet__name">
+            Savat {cart.count > 0 && <span className="di-cart-count">{cart.count}</span>}
+          </h2>
           <button onClick={onClose} className="di-sheet__close">✕</button>
         </div>
 
         <div className="di-sheet__body">
           {cart.items.length === 0 ? (
-            <p className="di-cart__empty">Savat bo&apos;sh</p>
+            <div className="di-cart__empty">
+              <div className="di-cart__empty-icon">🛒</div>
+              <p>Savat bo&apos;sh</p>
+              <span>Menyudan taom tanlang</span>
+            </div>
           ) : (
-            cart.items.map((item) => (
-              <div key={item.key} className="di-cart-item">
-                <div className="di-cart-item__body">
-                  <div className="di-cart-item__name">{item.dish.name}</div>
-                  {item.selectedOptions.length > 0 && (
-                    <div className="di-cart-item__opts">
-                      {item.selectedOptions.map((o) => o.name).join(", ")}
+            <div className="di-cart-list">
+              {cart.items.map((item) => (
+                <div key={item.key} className="di-cart-card">
+                  <div className="di-cart-card__img">
+                    {item.dish.imageUrl ? (
+                      <img src={item.dish.imageUrl} alt="" loading="lazy" />
+                    ) : (
+                      <span className="di-cart-card__ph">
+                        {item.dish.icon || "🍽"}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="di-cart-card__body">
+                    <div className="di-cart-card__name">{item.dish.name}</div>
+                    {item.selectedOptions.length > 0 && (
+                      <div className="di-cart-card__opts">
+                        {item.selectedOptions.map((o) => o.name).join(", ")}
+                      </div>
+                    )}
+                    <div className="di-cart-card__price">
+                      {som(item.unitPrice * item.quantity)}
                     </div>
-                  )}
-                  <div className="di-cart-item__price">
-                    {som(item.unitPrice * item.quantity)}
+                  </div>
+
+                  <div className="di-qty di-qty--card">
+                    <button
+                      onClick={() => cart.setQuantity(item.key, item.quantity - 1)}
+                      aria-label={item.quantity === 1 ? "O'chirish" : "Kamaytirish"}
+                    >
+                      {item.quantity === 1 ? "🗑" : "−"}
+                    </button>
+                    <span>{item.quantity}</span>
+                    <button
+                      onClick={() => cart.setQuantity(item.key, item.quantity + 1)}
+                      aria-label="Ko'paytirish"
+                    >
+                      +
+                    </button>
                   </div>
                 </div>
-
-                <div className="di-qty di-qty--sm">
-                  <button onClick={() => cart.setQuantity(item.key, item.quantity - 1)}>
-                    −
-                  </button>
-                  <span>{item.quantity}</span>
-                  <button onClick={() => cart.setQuantity(item.key, item.quantity + 1)}>
-                    +
-                  </button>
-                </div>
-              </div>
-            ))
+              ))}
+            </div>
           )}
 
           {cart.items.length > 0 && (
@@ -126,9 +153,9 @@ export function CartSheet({
             <button
               onClick={submit}
               disabled={sending}
-              className="di-btn di-btn--primary di-btn--block"
+              className="di-btn di-btn--primary di-btn--block di-btn--lg"
             >
-              {sending ? "Yuborilmoqda..." : "Buyurtma berish"}
+              {sending ? "Yuborilmoqda..." : `Yuborish · ${som(cart.subtotal)}`}
             </button>
           </div>
         )}

@@ -10,11 +10,15 @@ import { API_URL } from "../site";
 export class ApiError extends Error {
   code?: string;
   status: number;
+  // Server javobining o'zi — masalan COOLDOWN xatosida
+  // mavjud so'rov obyekti shu yerda keladi
+  data?: unknown;
 
-  constructor(message: string, status: number, code?: string) {
+  constructor(message: string, status: number, code?: string, data?: unknown) {
     super(message);
     this.status = status;
     this.code = code;
+    this.data = data;
   }
 }
 
@@ -51,7 +55,7 @@ async function request<T>(path: string, opts: FetchOpts = {}): Promise<T> {
     const base = err?.error || "Xatolik yuz berdi";
     const detail = err?.message && err.message !== base ? ` — ${err.message}` : "";
 
-    throw new ApiError(base + detail, res.status, err?.code);
+    throw new ApiError(base + detail, res.status, err?.code, data);
   }
 
   return data as T;
@@ -158,15 +162,16 @@ export const dineInApi = {
     }),
 
   createRequest: (sessionId: string, type: "waiter" | "bill") =>
-    request<{ _id: string; type: string; status: string }>("/dine-in/request", {
-      method: "POST",
-      body: JSON.stringify({ sessionId, type }),
-    }),
+    request<{ _id: string; type: string; status: string; createdAt: string }>(
+      "/dine-in/request",
+      { method: "POST", body: JSON.stringify({ sessionId, type }) },
+    ),
 
   myRequests: (sessionId: string) =>
-    request<Array<{ _id: string; type: string; status: string; acceptedByName?: string }>>(
-      `/dine-in/requests/${sessionId}`,
-    ),
+    request<Array<{
+      _id: string; type: string; status: string;
+      acceptedByName?: string; createdAt: string;
+    }>>(`/dine-in/requests/${sessionId}`),
 
   receipt: (sessionId: string) =>
     request<{

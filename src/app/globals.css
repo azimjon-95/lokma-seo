@@ -398,30 +398,97 @@ body {
   color: var(--di-ink);
 }
 .di-btn--block { width: 100%; }
+.di-btn--lg { padding: 16px 20px; font-size: 16px; border-radius: 16px; }
 
-/* ─── Savat elementi ─── */
-.di-cart-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 0;
-  border-bottom: 0.5px solid var(--di-line);
+/* ─── Savat: checklist kartalar ─── */
+.di-cart-sheet .di-sheet__box { max-height: 86dvh; }
+
+.di-cart-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height: 22px;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--di-brand);
+  color: var(--di-brand-text);
+  font-size: 12px; font-weight: 700;
+  vertical-align: middle;
 }
-.di-cart-item:last-of-type { border-bottom: none; }
-.di-cart-item__body { flex: 1; min-width: 0; }
-.di-cart-item__name { font-size: 14.5px; font-weight: 570; }
-.di-cart-item__opts {
+
+.di-cart-list {
+  display: flex; flex-direction: column;
+  gap: 10px;
+}
+
+.di-cart-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px;
+  background: var(--di-surface-2);
+  border: 1px solid var(--di-line);
+  border-radius: 16px;
+}
+
+.di-cart-card__img {
+  flex: none;
+  width: 56px; height: 56px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--di-surface);
+  display: flex; align-items: center; justify-content: center;
+}
+.di-cart-card__img img { width: 100%; height: 100%; object-fit: cover; }
+.di-cart-card__ph { font-size: 24px; }
+
+.di-cart-card__body { flex: 1; min-width: 0; }
+.di-cart-card__name {
+  font-size: 14.5px; font-weight: 620;
+  color: var(--di-ink);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.di-cart-card__opts {
   font-size: 12px; color: var(--di-muted);
   margin-top: 2px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.di-cart-item__price {
-  font-size: 14px; font-weight: 620;
+.di-cart-card__price {
+  font-size: 14px; font-weight: 650;
   color: var(--di-brand);
   margin-top: 4px;
   font-variant-numeric: tabular-nums;
 }
-.di-cart__empty {
-  text-align: center; color: var(--di-muted);
-  padding: 30px 0;
+
+/* Miqdor boshqaruvi — kartaning o'ng chetida, o'zi ustunga
+   qatlanadi (butun kenglikni band qilmaydi) */
+.di-qty--card {
+  flex: none;
+  display: flex; align-items: center; gap: 2px;
+  background: var(--di-surface);
+  border-radius: 12px;
+  padding: 3px;
 }
+.di-qty--card button {
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 9px;
+  font-size: 16px;
+  color: var(--di-ink);
+}
+.di-qty--card button:active { background: rgba(255, 255, 255, 0.08); }
+.di-qty--card span {
+  min-width: 22px;
+  text-align: center;
+  font-size: 14px; font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.di-cart__empty {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; color: var(--di-muted);
+  padding: 44px 0 30px;
+}
+.di-cart__empty-icon { font-size: 40px; margin-bottom: 10px; opacity: 0.7; }
+.di-cart__empty p { font-size: 14.5px; font-weight: 600; color: var(--di-ink); }
+.di-cart__empty span { font-size: 12.5px; margin-top: 3px; }
 
 .di-note {
   width: 100%;
@@ -896,8 +963,30 @@ body {
   background: rgba(245, 165, 36, 0.1);
   color: var(--di-brand);
 }
-.di-action:disabled { opacity: 0.75; }
+/* Sanoq paytida ham TO'LIQ ko'rinsin — o'chirilgan lekin
+   xira emas, aks holda mijoz "buzilgan" deb o'ylashi mumkin */
+.di-action:disabled { opacity: 1; cursor: default; }
 .di-action__icon { font-size: 16px; }
+.di-action__label {
+  font-variant-numeric: tabular-nums;   /* raqamlar sakramasin */
+}
+
+/* Qolgan vaqt halqasi — soat kabi kamayib boradi.
+   Oddiy matn oqimida, absolyut emas — button flex layoutiga
+   qo'shimcha element sifatida qo'shiladi. */
+.di-action__ring {
+  flex: none;
+  width: 15px; height: 15px;
+}
+.di-action__ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.di-action__ring circle {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3;
+  stroke-linecap: round;
+  opacity: 0.6;
+  transition: stroke-dashoffset 1s linear;
+}
 
 .di-header__orders {
   width: 38px; height: 38px;
