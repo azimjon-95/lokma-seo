@@ -66,6 +66,25 @@ body {
   --di-brand-text: #1C1815;
   --di-success: #6FBF73;
   --di-danger: #E14B42;
+
+  /* Nozik to'ldirishlar. Ilgari har joyda rgba(255,255,255,.0x)
+     qattiq yozilgan edi — oq fonda ular ko'rinmay qolardi.
+     O'zgaruvchiga o'tkazilgani uchun mavzuni almashtirish
+     endi bitta blokda bo'ladi. Qiymatlar aynan avvalgidek,
+     ofitsiant paneli ko'rinishi o'zgarmaydi. */
+  --di-tint-soft: rgba(255, 255, 255, 0.04);
+  --di-tint: rgba(255, 255, 255, 0.07);
+  --di-tint-strong: rgba(255, 255, 255, 0.10);
+
+  /* Sarlavha va pastki menyu ostidagi xira qatlam */
+  --di-veil: rgba(20, 17, 15, 0.88);
+  --di-veil-nav: rgba(20, 17, 15, 0.92);
+  --di-veil-lock: rgba(15, 12, 10, 0.97);
+
+  /* Stol chizmasi: yog'och disk va kursilar */
+  --di-wood-1: #8A6A4E;
+  --di-wood-2: #5A4331;
+  --di-seat: #3B2E23;
 }
 
 .di-page {
@@ -87,14 +106,14 @@ body {
   position: sticky; top: 0; z-index: 20;
   display: flex; align-items: center; gap: 12px;
   padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 14px;
-  background: rgba(20, 17, 15, 0.88);
+  background: var(--di-veil);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 0.5px solid var(--di-line);
 }
 .di-header__back {
   width: 34px; height: 34px; border-radius: 50%;
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--di-tint);
   color: var(--di-ink); font-size: 18px;
   flex: none;
 }
@@ -267,7 +286,7 @@ body {
 }
 .di-sheet__close {
   width: 32px; height: 32px; border-radius: 50%;
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--di-tint);
   color: var(--di-muted); font-size: 15px;
 }
 
@@ -366,7 +385,7 @@ body {
   font-size: 19px;
   display: flex; align-items: center; justify-content: center;
 }
-.di-qty button:active { background: rgba(255, 255, 255, 0.08); }
+.di-qty button:active { background: var(--di-tint-strong); }
 .di-qty span {
   min-width: 30px; text-align: center;
   font-size: 15px; font-weight: 620;
@@ -473,7 +492,7 @@ body {
   font-size: 16px;
   color: var(--di-ink);
 }
-.di-qty--card button:active { background: rgba(255, 255, 255, 0.08); }
+.di-qty--card button:active { background: var(--di-tint-strong); }
 .di-qty--card span {
   min-width: 22px;
   text-align: center;
@@ -991,7 +1010,7 @@ body {
 .di-header__orders {
   width: 38px; height: 38px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--di-tint);
   font-size: 17px;
   flex: none;
   margin-left: auto;
@@ -1396,7 +1415,7 @@ body {
   margin-left: 10px;
   padding: 3px 9px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--di-tint);
   color: var(--di-muted);
   font-size: 11.5px;
   font-weight: 600;
@@ -1429,7 +1448,7 @@ body {
   flex: none;
   margin-right: 8px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--di-tint-strong);
   color: var(--di-ink);
   font-size: 15px;
   line-height: 1;
@@ -1521,7 +1540,7 @@ html.app-locked:has(.di-sheet) .di-page { overflow: hidden; }
   flex: none;
   padding: 7px 11px;
   border-radius: 11px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--di-tint);
   border: 1px solid var(--di-line);
   color: var(--di-ink);
   font-size: 13px; font-weight: 600;
@@ -1548,7 +1567,7 @@ html.app-locked:has(.di-sheet) .di-page { overflow: hidden; }
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
 .wt-stat:active { transform: scale(0.97); }
-.wt-stat.is-on { background: rgba(255, 255, 255, 0.05); }
+.wt-stat.is-on { background: var(--di-tint-soft); }
 
 .wt-stat__dot {
   width: 27px; height: 27px;
@@ -1658,7 +1677,7 @@ html.app-locked:has(.di-sheet) .di-page { overflow: hidden; }
   color: var(--di-muted);
   font-size: 15px; line-height: 1;
 }
-.wt-card__more:active { background: rgba(255, 255, 255, 0.08); }
+.wt-card__more:active { background: var(--di-tint-strong); }
 
 /* Stol chizmasi */
 .wt-card__plan { display: flex; justify-content: center; padding: 14px 0 10px; }
@@ -1667,7 +1686,7 @@ html.app-locked:has(.di-sheet) .di-page { overflow: hidden; }
   position: absolute; inset: 16px;
   display: flex; align-items: center; justify-content: center;
   border-radius: 999px;
-  background: radial-gradient(circle at 34% 28%, #8A6A4E, #5A4331 70%);
+  background: radial-gradient(circle at 34% 28%, var(--di-wood-1), var(--di-wood-2) 70%);
   border: 2px solid var(--c);
   box-shadow: 0 0 14px color-mix(in srgb, var(--c) 40%, transparent);
   color: #fff; font-size: 22px; font-weight: 700;
@@ -1678,7 +1697,7 @@ html.app-locked:has(.di-sheet) .di-page { overflow: hidden; }
   width: 13px; height: 16px;
   margin: -8px 0 0 -6.5px;
   border-radius: 6px 6px 4px 4px;
-  background: #3B2E23;
+  background: var(--di-seat);
   transform-origin: center;
 }
 .wt-seat.is-taken {
@@ -1702,7 +1721,7 @@ html.app-locked:has(.di-sheet) .di-page { overflow: hidden; }
   display: inline-flex; align-items: center; justify-content: center; gap: 4px;
   padding: 6px 4px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--di-tint-soft);
   border: 1px solid var(--di-line);
   text-align: center;
   font-size: 11.5px;
@@ -1740,7 +1759,7 @@ html.app-locked:has(.di-sheet) .di-page { overflow: hidden; }
   z-index: 30;
   display: flex; align-items: flex-end;
   padding-bottom: env(safe-area-inset-bottom, 0px);
-  background: rgba(20, 17, 15, 0.92);
+  background: var(--di-veil-nav);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border-top: 1px solid var(--di-line);
@@ -1778,7 +1797,7 @@ html.app-locked:has(.di-sheet) .di-page { overflow: hidden; }
   background:
     radial-gradient(circle at 50% 22%, #FFD98A 0%, #F5A524 46%, #C9761A 100%);
   box-shadow:
-    0 0 0 5px rgba(20, 17, 15, 0.95),
+    0 0 0 5px var(--di-bg),
     inset 0 2px 3px rgba(255, 255, 255, 0.65),
     inset 0 -3px 6px rgba(120, 60, 0, 0.4),
     0 8px 18px rgba(245, 165, 36, 0.35),
@@ -1793,7 +1812,7 @@ html.app-locked:has(.di-sheet) .di-page { overflow: hidden; }
   background: radial-gradient(circle at 50% 22%, #6B5B4B 0%, #4A3D31 55%, #332A22 100%);
   color: #C9B79F;
   box-shadow:
-    0 0 0 5px rgba(20, 17, 15, 0.95),
+    0 0 0 5px var(--di-bg),
     inset 0 2px 3px rgba(255, 255, 255, 0.18),
     inset 0 -3px 6px rgba(0, 0, 0, 0.35),
     0 3px 8px rgba(0, 0, 0, 0.45);
@@ -1953,7 +1972,7 @@ select {
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   gap: 10px;
-  background: rgba(15, 12, 10, 0.97);
+  background: var(--di-veil-lock);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   color: var(--di-ink);
@@ -2012,7 +2031,7 @@ select {
   padding: 11px 22px;
   border-radius: 999px;
   border: 1px solid var(--di-line);
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--di-tint-soft);
   color: var(--di-muted);
   font-size: 14px;
   animation: kio-glow 2.6s ease-in-out infinite;
@@ -2035,7 +2054,7 @@ select {
   top: max(18px, env(safe-area-inset-top, 0px)); right: 18px;
   width: 40px; height: 40px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--di-tint);
   color: var(--di-muted);
   font-size: 17px;
 }
@@ -2085,7 +2104,7 @@ select {
   height: 78px;
   display: flex; align-items: center; justify-content: center;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--di-tint);
   color: var(--di-ink);
   font-size: 27px; font-weight: 400;
   font-variant-numeric: tabular-nums;
@@ -2235,4 +2254,156 @@ select {
   color: var(--di-brand);
   font-size: 14.5px; font-weight: 650;
   font-variant-numeric: tabular-nums;
+}
+
+/* ══════════════════════════════════════════════════════
+   KIOSK — OQ MAVZU va IXCHAM KARTALAR
+
+   `html.kio-ui` sinfi KioskApp tomonidan qo'yiladi.
+   Nega html darajasida: TableSheet, DishSheet va qulf
+   `position: fixed` bilan chiziladi va DOM'da boshqa
+   joyda turadi — o'rovchi div'ga qo'ysak ular qora
+   qolib ketardi.
+
+   Ofitsiant paneliga TEGMAYDI: u bu sinfsiz ochiladi.
+   ══════════════════════════════════════════════════════ */
+
+html.kio-ui {
+  --di-bg: #F6F3EF;          /* iliq oq — sof oq ekran charchatadi */
+  --di-surface: #FFFFFF;
+  --di-surface-2: #EFEAE3;
+  --di-line: rgba(28, 22, 16, 0.10);
+  --di-ink: #1A1512;
+  --di-muted: #7B6E60;
+  --di-brand: #C97A12;       /* oq fonda kontrast uchun to'qroq */
+  --di-brand-text: #FFFFFF;
+  --di-success: #2E8B4F;
+  --di-danger: #C93B31;
+
+  --di-tint-soft: rgba(28, 22, 16, 0.04);
+  --di-tint: rgba(28, 22, 16, 0.06);
+  --di-tint-strong: rgba(28, 22, 16, 0.10);
+
+  --di-veil: rgba(255, 255, 255, 0.90);
+  --di-veil-nav: rgba(255, 255, 255, 0.94);
+  --di-veil-lock: rgba(246, 243, 239, 0.97);
+
+  --di-wood-1: #D9BFA0;
+  --di-wood-2: #B99871;
+  --di-seat: #DCD4CA;
+
+  background: var(--di-bg);
+}
+
+/* Kartalar oq fonda "suzib" turmasligi uchun — yumshoq soya */
+html.kio-ui .wt-card,
+html.kio-ui .kio-stop__row,
+html.kio-ui .kio-menu__row {
+  box-shadow: 0 1px 2px rgba(28, 22, 16, 0.05);
+}
+
+/* Stol raqami yog'och disk ustida — oq mavzuda qora yozuv */
+html.kio-ui .wt-card__disc { color: #2A1F14; }
+
+/* Pastki menyudagi doira oq fonda ham ajralib tursin */
+html.kio-ui .wt-nav__disc {
+  color: #FFFFFF;
+  background: radial-gradient(circle at 50% 22%, #E8A63C 0%, #C97A12 46%, #9A5A08 100%);
+  box-shadow:
+    0 0 0 5px var(--di-bg),
+    inset 0 2px 3px rgba(255, 255, 255, 0.35),
+    0 8px 18px rgba(201, 122, 18, 0.28),
+    0 3px 6px rgba(0, 0, 0, 0.12);
+}
+
+/* Qulf ekrani oq mavzuda */
+html.kio-ui .kio-lock { color: var(--di-ink); }
+html.kio-ui .kio-lock__disc { color: #FFFFFF; }
+html.kio-ui .kio-pin__dots span { border-color: rgba(28, 22, 16, 0.25); }
+html.kio-ui .kio-pin__grid button { background: rgba(28, 22, 16, 0.05); }
+html.kio-ui .kio-pin__grid button:active:not(:disabled) {
+  background: rgba(201, 122, 18, 0.16);
+}
+html.kio-ui .kio-lock__hint { background: rgba(28, 22, 16, 0.03); }
+
+/* ─── IXCHAM STOL KARTALARI ───
+   Ilgari bitta karta ekranning yarmini egallardi: stol chizmasi
+   96px, ostida ikki qatorli meta va alohida tugma. Planshetda
+   6-8 stolni bir vaqtda ko'rish uchun hammasi kichraytirildi
+   va kengroq ekranda ustunlar soni oshadi. */
+
+html.kio-ui .wt-grid {
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 10px;
+}
+
+html.kio-ui .wt-card {
+  padding: 9px 9px 10px;
+  border-radius: 14px;
+  border-width: 1.5px;
+}
+
+html.kio-ui .wt-card__badge {
+  padding: 3px 7px;
+  font-size: 9px;
+}
+html.kio-ui .wt-card__more { width: 22px; height: 22px; font-size: 14px; }
+
+/* Chizma 96 → 62: stol shakli tanib olinadi, lekin joy yemaydi */
+html.kio-ui .wt-card__plan { padding: 8px 0 6px; }
+html.kio-ui .wt-card__seats { width: 62px; height: 62px; }
+html.kio-ui .wt-card__disc {
+  inset: 10px;
+  font-size: 16px;
+  border-width: 2px;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--c) 30%, transparent);
+}
+html.kio-ui .wt-seat {
+  width: 9px; height: 11px;
+  margin: -5.5px 0 0 -4.5px;
+  border-radius: 4px 4px 3px 3px;
+}
+
+html.kio-ui .wt-card__name {
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+/* Meta yonma-yon, bitta qatorda — balandlik ikki barobar kamayadi */
+html.kio-ui .wt-card__meta {
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-bottom: 5px;
+}
+html.kio-ui .wt-card__meta span {
+  padding: 4px 3px;
+  border-radius: 8px;
+  font-size: 10.5px;
+  gap: 3px;
+}
+
+html.kio-ui .wt-card__sum {
+  font-size: 12px;
+  margin-bottom: 7px;
+}
+
+html.kio-ui .wt-card__cta {
+  padding: 8px 4px;
+  border-radius: 9px;
+  font-size: 10.5px;
+}
+
+/* Tepadagi jamlanma ham ixchamroq */
+html.kio-ui .wt-stat { padding: 8px 10px; }
+html.kio-ui .wt-stat__body b { font-size: 15px; }
+html.kio-ui .wt-stat__dot { width: 26px; height: 26px; }
+
+/* Planshet va kompyuterda ustunlar ko'payadi — bir ekranda
+   butun zal ko'rinadi, aylantirish kerak bo'lmaydi */
+@media (min-width: 640px) {
+  html.kio-ui .wt-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+}
+@media (min-width: 1024px) {
+  html.kio-ui .wt-grid { grid-template-columns: repeat(auto-fill, minmax(178px, 1fr)); }
+  html.kio-ui .di-list, html.kio-ui .wt-toolbar, html.kio-ui .wt-stats { max-width: 1280px; margin-inline: auto; }
 }

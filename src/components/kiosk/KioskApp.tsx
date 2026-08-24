@@ -44,6 +44,15 @@ export function KioskApp({ token }: { token: string }) {
 
   useWakeLock(phase === "ready");
 
+  /* Kiosk oq mavzuda va ixcham kartalar bilan ishlaydi.
+     Sinf <html> ga qo'yiladi — TableSheet/DishSheet/qulf
+     `position: fixed` bilan DOM'ning boshqa joyida chiziladi,
+     o'rovchi div'ga qo'ysak ular qora qolib ketardi. */
+  useEffect(() => {
+    document.documentElement.classList.add("kio-ui");
+    return () => document.documentElement.classList.remove("kio-ui");
+  }, []);
+
   const loadTables = useCallback(async () => {
     try {
       setTables(await waiterApi.tables());
