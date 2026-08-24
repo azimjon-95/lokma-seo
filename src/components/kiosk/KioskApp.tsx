@@ -114,12 +114,17 @@ export function KioskApp({ token }: { token: string }) {
         .catch(() => { /* rad etilsa sahifa baribir ishlaydi */ });
     };
 
-    const once = () => {
-      request();
-      window.removeEventListener("pointerdown", once);
-    };
-    window.addEventListener("pointerdown", once);
-    return () => window.removeEventListener("pointerdown", once);
+    /*
+     * Har tegishda tekshiriladi, bir marta emas.
+     *
+     * Ilgari birinchi tegishdan keyin tinglovchi olib
+     * tashlanardi — Esc bosilsa yoki tizim rejimdan
+     * chiqarsa, planshet shu holda qolib ketardi.
+     * Fullscreen allaqachon yoqiq bo'lsa `request` darhol
+     * qaytadi, ya'ni ortiqcha yuk yo'q.
+     */
+    window.addEventListener("pointerdown", request, { passive: true });
+    return () => window.removeEventListener("pointerdown", request);
   }, [phase, cfg?.autoFullscreen]);
 
   /* ═══ Link hali tirikmi ═══
@@ -189,6 +194,7 @@ export function KioskApp({ token }: { token: string }) {
         onLogout={() => {}}
         hideLogout
         subtitle={cfg.label || "Kiosk"}
+        compact
         extraTabs={extraTabs.length > 0 ? extraTabs : undefined}
       />
 

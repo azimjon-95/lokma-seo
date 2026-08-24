@@ -79,7 +79,7 @@ function openedAt(t: WaiterTable) {
 }
 
 export function WaiterTables({
-  me, tables, onRefresh, onLogout, extraTabs, subtitle, hideLogout,
+  me, tables, onRefresh, onLogout, extraTabs, subtitle, hideLogout, compact,
 }: {
   me: Me;
   tables: WaiterTable[];
@@ -98,6 +98,7 @@ export function WaiterTables({
    * Ekranni nusxalash o'rniga tashqi yorliqlar prop bilan
    * uzatiladi: stol mantig'i bitta joyda qoladi.
    */
+  compact?: boolean;
   extraTabs?: Array<{
     key: string;
     label: string;
@@ -268,6 +269,7 @@ export function WaiterTables({
                     state={stateOf(t, billTables)}
                     onOpen={() => openTable(t)}
                     onMenu={() => setSheet(t)}
+                    compact={compact}
                   />
                 ))}
               </div>
@@ -367,18 +369,98 @@ function NavItem({
 
 /** Stol kartasi — ro'yxat ko'rinishida. */
 function TableCard({
-  table: t, state, onOpen, onMenu,
+  table: t, state, onOpen, onMenu, compact,
 }: {
   table: WaiterTable;
   state: State;
   onOpen: () => void;
   onMenu: () => void;
+  compact?: boolean;
 }) {
   const st = STATE[state];
   const capacity = t.capacity || 4;
   const guests = t.guestCount || 0;
   // Sig'imdan ko'p mehmon kelsa stul qo'shiladi
   const seats = Math.min(14, Math.max(2, capacity, guests));
+
+  /*
+   * O'rindiqlar markazdan qancha uzoqda turishi.
+   *
+   * Ilgari bu qiymat shu yerda 44px qilib qotirilgan edi.
+   * Kartani kichraytirganda disk 96 -> 62px bo'ldi-yu, o'rindiqlar
+   * o'sha 44px da qolib, stoldan ajralib uchib yurdi.
+   * Endi radius CSS'dan (--seat-r) olinadi va disk bilan birga
+   * kichrayadi — chizma har o'lchamda butun ko'rinadi.
+   */
+  const plan = (
+    <div className="wt-card__seats">
+      {Array.from({ length: seats }).map((_, i) => (
+        <span
+          key={i}
+          className={`wt-seat ${i < guests ? "is-taken" : ""}`}
+          style={{
+            transform: `rotate(${(i / seats) * 360 - 90}deg) translateY(calc(var(--seat-r) * -1))`,
+          }}
+        />
+      ))}
+      <span className="wt-card__disc">{t.tableNumber}</span>
+    </div>
+  );
+
+  /*
+   * IXCHAM KARTA (kiosk).
+   *
+   * Tepadagi "⋮" va pastdagi katta tugma olib tashlandi:
+   * kartaning O'ZI tugma. Zalda ofitsiant yugurib yuradi —
+   * 24px li nishonga tegishdan ko'ra butun kartaga urish
+   * osonroq va xato bosish kamayadi.
+   *
+   * Holat rangi chap chekkadagi ingichka chiziq va disk
+   * halqasi orqali beriladi — matnli nishon joy yegan edi.
+   *
+   * Uzoq bosish -> stol varag'i (mehmon soni, hisob, yopish).
+   */
+  if (compact) {
+    return (
+      <article
+        className="wt-card wt-card--mini"
+        style={{ ["--c" as string]: st.color }}
+        onClick={onOpen}
+        onContextMenu={(e) => { e.preventDefault(); onMenu(); }}
+        onPointerDown={(e) => {
+          if (e.pointerType === "mouse") return;
+          const id = setTimeout(onMenu, 480);
+          const cancel = () => {
+            clearTimeout(id);
+            window.removeEventListener("pointerup", cancel);
+            window.removeEventListener("pointercancel", cancel);
+            window.removeEventListener("pointermove", cancel);
+          };
+          window.addEventListener("pointerup", cancel);
+          window.addEventListener("pointercancel", cancel);
+          window.addEventListener("pointermove", cancel);
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label={`${t.tableName || `Stol ${t.tableNumber}`} — ${st.label}`}
+      >
+        <div className="wt-card__plan">{plan}</div>
+
+        <div className="wt-mini__name">{t.tableName || `Stol ${t.tableNumber}`}</div>
+
+        <div className="wt-mini__row">
+          <span><Users size={11} strokeWidth={2.4} />{guests}/{capacity}</span>
+          {openedAt(t) !== "–" && (
+            <span><Clock size={11} strokeWidth={2.4} />{openedAt(t)}</span>
+          )}
+        </div>
+
+        {(t.orderTotal || 0) > 0 && (
+          <div className="wt-mini__sum">{som(t.orderTotal || 0)}</div>
+        )}
+      </article>
+    );
+  }
 
   return (
     <article className="wt-card" style={{ ["--c" as string]: st.color }}>
@@ -392,18 +474,7 @@ function TableCard({
       </div>
 
       {/* Stol chizmasi */}
-      <div className="wt-card__plan">
-        <div className="wt-card__seats">
-          {Array.from({ length: seats }).map((_, i) => (
-            <span
-              key={i}
-              className={`wt-seat ${i < guests ? "is-taken" : ""}`}
-              style={{ transform: `rotate(${(i / seats) * 360 - 90}deg) translateY(-44px)` }}
-            />
-          ))}
-          <span className="wt-card__disc">{t.tableNumber}</span>
-        </div>
-      </div>
+      <div className="wt-card__plan">{plan}</div>
 
       <div className="wt-card__name">{t.tableName || `Stol ${t.tableNumber}`}</div>
 

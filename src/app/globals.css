@@ -1681,7 +1681,10 @@ html.app-locked:has(.di-sheet) .di-page { overflow: hidden; }
 
 /* Stol chizmasi */
 .wt-card__plan { display: flex; justify-content: center; padding: 14px 0 10px; }
-.wt-card__seats { position: relative; width: 96px; height: 96px; }
+/* --seat-r: o'rindiqlar markazdan qancha uzoqda. Disk o'lchami
+   bilan birga o'zgarishi SHART, aks holda stullar stoldan
+   ajralib qoladi. */
+.wt-card__seats { position: relative; width: 96px; height: 96px; --seat-r: 44px; }
 .wt-card__disc {
   position: absolute; inset: 16px;
   display: flex; align-items: center; justify-content: center;
@@ -2326,71 +2329,89 @@ html.kio-ui .kio-pin__grid button:active:not(:disabled) {
 }
 html.kio-ui .kio-lock__hint { background: rgba(28, 22, 16, 0.03); }
 
-/* ─── IXCHAM STOL KARTALARI ───
-   Ilgari bitta karta ekranning yarmini egallardi: stol chizmasi
-   96px, ostida ikki qatorli meta va alohida tugma. Planshetda
-   6-8 stolni bir vaqtda ko'rish uchun hammasi kichraytirildi
-   va kengroq ekranda ustunlar soni oshadi. */
+/* ─── IXCHAM STOL KARTALARI (kiosk) ───
+   Kartaning o'zi tugma: tepadagi "⋮" va pastdagi katta tugma
+   yo'q. Holat chap chekkadagi rangli chiziq va disk halqasi
+   bilan ko'rsatiladi — matnli nishon karta balandligining
+   uchdan birini yeb turardi. */
 
 html.kio-ui .wt-grid {
-  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(116px, 1fr));
+  gap: 8px;
 }
 
-html.kio-ui .wt-card {
-  padding: 9px 9px 10px;
-  border-radius: 14px;
-  border-width: 1.5px;
+html.kio-ui .wt-card--mini {
+  position: relative;
+  overflow: hidden;
+  padding: 10px 8px 9px;
+  border-radius: 13px;
+  border: 1px solid var(--di-line);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
+}
+html.kio-ui .wt-card--mini:active {
+  transform: scale(0.965);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--c) 45%, transparent);
 }
 
-html.kio-ui .wt-card__badge {
-  padding: 3px 7px;
-  font-size: 9px;
+/* Holat — chap chekkadagi chiziq. Bo'sh stolda ham bor,
+   shuning uchun ko'z bir qarashda zalni "o'qiy" oladi. */
+html.kio-ui .wt-card--mini::before {
+  content: "";
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3.5px;
+  background: var(--c);
 }
-html.kio-ui .wt-card__more { width: 22px; height: 22px; font-size: 14px; }
 
-/* Chizma 96 → 62: stol shakli tanib olinadi, lekin joy yemaydi */
-html.kio-ui .wt-card__plan { padding: 8px 0 6px; }
-html.kio-ui .wt-card__seats { width: 62px; height: 62px; }
-html.kio-ui .wt-card__disc {
-  inset: 10px;
-  font-size: 16px;
+/* Chizma: disk 44px, o'rindiqlar 26px radiusda —
+   stolga TEGIB turadi, uzoqda uchmaydi */
+html.kio-ui .wt-card--mini .wt-card__plan { padding: 2px 0 7px; }
+html.kio-ui .wt-card--mini .wt-card__seats {
+  width: 62px; height: 62px;
+  --seat-r: 26px;
+}
+html.kio-ui .wt-card--mini .wt-card__disc {
+  inset: 9px;
+  font-size: 15px; font-weight: 700;
   border-width: 2px;
-  box-shadow: 0 0 8px color-mix(in srgb, var(--c) 30%, transparent);
+  box-shadow: none;
 }
-html.kio-ui .wt-seat {
-  width: 9px; height: 11px;
-  margin: -5.5px 0 0 -4.5px;
-  border-radius: 4px 4px 3px 3px;
+html.kio-ui .wt-card--mini .wt-seat {
+  width: 8px; height: 9px;
+  margin: -4.5px 0 0 -4px;
+  border-radius: 3px 3px 2px 2px;
+  box-shadow: none;
+}
+html.kio-ui .wt-card--mini .wt-seat.is-taken {
+  background: var(--c);
+  box-shadow: none;
 }
 
-html.kio-ui .wt-card__name {
-  font-size: 13px;
-  margin-bottom: 6px;
+html.kio-ui .wt-mini__name {
+  text-align: center;
+  font-size: 12px; font-weight: 600;
+  color: var(--di-ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
-/* Meta yonma-yon, bitta qatorda — balandlik ikki barobar kamayadi */
-html.kio-ui .wt-card__meta {
-  grid-template-columns: 1fr 1fr;
-  gap: 4px;
-  margin-bottom: 5px;
-}
-html.kio-ui .wt-card__meta span {
-  padding: 4px 3px;
-  border-radius: 8px;
+html.kio-ui .wt-mini__row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; margin-top: 3px;
+  color: var(--di-muted);
   font-size: 10.5px;
-  gap: 3px;
+  font-variant-numeric: tabular-nums;
+}
+html.kio-ui .wt-mini__row span {
+  display: inline-flex; align-items: center; gap: 2.5px;
 }
 
-html.kio-ui .wt-card__sum {
-  font-size: 12px;
-  margin-bottom: 7px;
-}
-
-html.kio-ui .wt-card__cta {
-  padding: 8px 4px;
-  border-radius: 9px;
-  font-size: 10.5px;
+html.kio-ui .wt-mini__sum {
+  margin-top: 4px;
+  text-align: center;
+  font-size: 11.5px; font-weight: 700;
+  color: var(--c);
+  font-variant-numeric: tabular-nums;
 }
 
 /* Tepadagi jamlanma ham ixchamroq */
@@ -2400,10 +2421,20 @@ html.kio-ui .wt-stat__dot { width: 26px; height: 26px; }
 
 /* Planshet va kompyuterda ustunlar ko'payadi — bir ekranda
    butun zal ko'rinadi, aylantirish kerak bo'lmaydi */
+/* Kengroq ekranda ustunlar ko'payadi — bir ekranda butun zal */
 @media (min-width: 640px) {
-  html.kio-ui .wt-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  html.kio-ui .wt-grid { grid-template-columns: repeat(auto-fill, minmax(126px, 1fr)); gap: 10px; }
 }
 @media (min-width: 1024px) {
-  html.kio-ui .wt-grid { grid-template-columns: repeat(auto-fill, minmax(178px, 1fr)); }
-  html.kio-ui .di-list, html.kio-ui .wt-toolbar, html.kio-ui .wt-stats { max-width: 1280px; margin-inline: auto; }
+  html.kio-ui .wt-grid { grid-template-columns: repeat(auto-fill, minmax(136px, 1fr)); }
+  html.kio-ui .di-list,
+  html.kio-ui .wt-toolbar,
+  html.kio-ui .wt-stats,
+  html.kio-ui .wt-chips { max-width: 1400px; margin-inline: auto; }
 }
+
+/* Bo'sh joyni yeydigan tashqi hoshiyalar qisqartirildi */
+html.kio-ui .di-list { padding-left: 10px; padding-right: 10px; }
+html.kio-ui .wt-toolbar { padding-left: 10px; padding-right: 10px; }
+html.kio-ui .wt-stats { padding-left: 10px; padding-right: 10px; }
+html.kio-ui .di-header { padding-top: calc(9px + env(safe-area-inset-top, 0px)); padding-bottom: 9px; }

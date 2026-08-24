@@ -71,12 +71,37 @@ export function useWakeLock(enabled: boolean) {
       if (document.visibilityState === "visible") acquire();
     };
 
+    /*
+     * Foydalanuvchi harakatida ham qayta so'raymiz.
+     *
+     * SABAB: brauzer qulfni jimgina bekor qilishi mumkin —
+     * batareya kamayganda, tizim quvvat tejash rejimiga
+     * o'tganda yoki tab fonga tushib qaytganda. `release`
+     * hodisasi har doim ham kelmaydi, shuning uchun faqat
+     * visibilitychange ga tayanish yetarli emas edi:
+     * planshet bir necha soatdan keyin ekranni o'chirib
+     * qo'yardi. Har tegishda tekshirish arzon — qulf
+     * allaqachon bor bo'lsa `acquire` darhol qaytadi.
+     */
+    const onActivity = () => acquire();
+
     acquire();
     document.addEventListener("visibilitychange", onVisible);
+    document.addEventListener("fullscreenchange", onActivity);
+    window.addEventListener("pointerdown", onActivity, { passive: true });
+    window.addEventListener("focus", onActivity);
+
+    // Har 30 soniyada tekshirib turamiz — yuqoridagi hodisalarning
+    // birortasi ham kelmagan holat uchun oxirgi to'siq
+    const guard = setInterval(acquire, 30_000);
 
     return () => {
       cancelled = true;
+      clearInterval(guard);
       document.removeEventListener("visibilitychange", onVisible);
+      document.removeEventListener("fullscreenchange", onActivity);
+      window.removeEventListener("pointerdown", onActivity);
+      window.removeEventListener("focus", onActivity);
       ref.current?.release().catch(() => {});
       ref.current = null;
     };

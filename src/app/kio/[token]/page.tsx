@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { KioskApp } from "@/components/kiosk/KioskApp";
 
 /**
@@ -10,6 +10,25 @@ import { KioskApp } from "@/components/kiosk/KioskApp";
 export const metadata: Metadata = {
   title: "LokmaGo — Kiosk",
   robots: { index: false, follow: false, nocache: true },
+  // iPhone'da to'liq ekranning yagona yo'li — bosh ekranga
+  // qo'shish. Bu meta'lar bo'lmasa PWA Safari panelini
+  // saqlab qoladi.
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Kiosk",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#F6F3EF",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  // Ekranning eng chetigacha — "tirnoq" atrofida oq
+  // chiziq qolmasin
+  viewportFit: "cover",
 };
 
 // Har bir token alohida — oldindan generatsiya qilinmaydi
