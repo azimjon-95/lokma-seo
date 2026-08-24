@@ -1892,3 +1892,347 @@ select {
   font-size: 16px;
 }
 .wt-search input { font-size: 16px; }
+
+/* ══════════════════════════════════════════════════════
+   KIOSK — zaldagi planshet (/kio/{token})
+   ══════════════════════════════════════════════════════ */
+
+/* ═══ Yuklanish va xato ekrani ═══ */
+.kio-boot {
+  min-height: 100dvh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 14px; padding: 32px 24px;
+  background: var(--di-bg);
+  color: var(--di-ink);
+  text-align: center;
+}
+.kio-boot p { color: var(--di-muted); font-size: 14px; }
+
+.kio-boot__icon {
+  width: 78px; height: 78px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 999px;
+  background: rgba(225, 75, 66, 0.12);
+  color: var(--di-danger);
+}
+.kio-boot--error h1 {
+  font-size: 19px; font-weight: 650;
+  line-height: 1.35; max-width: 22ch;
+}
+.kio-boot--error p { max-width: 30ch; line-height: 1.5; }
+
+.kio-boot__retry {
+  margin-top: 6px;
+  padding: 12px 28px;
+  border-radius: 14px;
+  background: var(--di-brand);
+  color: var(--di-brand-text);
+  font-size: 15px; font-weight: 600;
+}
+
+.kio-boot__brand {
+  position: absolute; bottom: 28px;
+  display: flex; align-items: center; gap: 6px;
+  color: var(--di-muted);
+  font-size: 13px; font-weight: 500;
+}
+
+.kio-loading {
+  display: flex; justify-content: center;
+  padding: 48px 0;
+}
+
+/* ═══ Qulf: 1-bosqich (animatsiya) ═══
+   Ustidan hamma narsani yopadi — z-index navdan (30) va
+   sheet'lardan yuqori bo'lishi shart, aks holda ochiq
+   oyna qulf tagidan ko'rinib qolardi. */
+.kio-lock {
+  position: fixed; inset: 0;
+  z-index: 200;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 10px;
+  background: rgba(15, 12, 10, 0.97);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--di-ink);
+  cursor: pointer;
+  user-select: none; -webkit-user-select: none;
+  animation: kio-fade 0.45s ease;
+}
+@keyframes kio-fade { from { opacity: 0; } to { opacity: 1; } }
+
+.kio-lock__pulse {
+  position: relative;
+  width: 132px; height: 132px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 12px;
+}
+.kio-lock__disc {
+  position: relative; z-index: 2;
+  width: 92px; height: 92px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 999px;
+  color: #2C1400;
+  background: radial-gradient(circle at 50% 24%, #FFD98A 0%, #F5A524 48%, #C9761A 100%);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.6),
+    0 10px 30px rgba(245, 165, 36, 0.3);
+  animation: kio-breathe 3.4s ease-in-out infinite;
+}
+@keyframes kio-breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.06); }
+}
+
+/* Tarqaluvchi halqalar — planshet "uxlayotgani" belgisi */
+.kio-lock__ring {
+  position: absolute; inset: 0;
+  border-radius: 999px;
+  border: 2px solid rgba(245, 165, 36, 0.4);
+  animation: kio-ripple 3.4s ease-out infinite;
+}
+.kio-lock__ring--2 { animation-delay: 1.7s; }
+@keyframes kio-ripple {
+  0%   { transform: scale(0.7); opacity: 0.7; }
+  100% { transform: scale(1.25); opacity: 0; }
+}
+
+.kio-lock__clock {
+  font-size: 46px; font-weight: 250;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.kio-lock__rest { font-size: 17px; font-weight: 600; }
+.kio-lock__label { color: var(--di-muted); font-size: 14px; }
+
+.kio-lock__hint {
+  margin-top: 22px;
+  padding: 11px 22px;
+  border-radius: 999px;
+  border: 1px solid var(--di-line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--di-muted);
+  font-size: 14px;
+  animation: kio-glow 2.6s ease-in-out infinite;
+}
+@keyframes kio-glow {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+
+/* ═══ Qulf: 2-bosqich (PIN) ═══ */
+.kio-lock--pad {
+  justify-content: flex-start;
+  padding-top: max(56px, env(safe-area-inset-top, 0px));
+  cursor: default;
+  gap: 0;
+}
+
+.kio-pin__back {
+  position: absolute;
+  top: max(18px, env(safe-area-inset-top, 0px)); right: 18px;
+  width: 40px; height: 40px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--di-muted);
+  font-size: 17px;
+}
+
+.kio-pin__rest { color: var(--di-muted); font-size: 14px; }
+.kio-pin__title { margin-top: 4px; font-size: 20px; font-weight: 600; }
+
+.kio-pin__dots {
+  display: flex; gap: 16px;
+  margin: 26px 0 0;
+}
+.kio-pin__dots span {
+  width: 15px; height: 15px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.28);
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+.kio-pin__dots span.is-on {
+  background: var(--di-brand);
+  border-color: var(--di-brand);
+  transform: scale(1.12);
+}
+/* Xatoda silkitish — matnni o'qimasdan ham tushunarli */
+.kio-pin__dots.is-error { animation: kio-shake 0.4s ease; }
+.kio-pin__dots.is-error span { border-color: var(--di-danger); }
+@keyframes kio-shake {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-9px); }
+  75%      { transform: translateX(9px); }
+}
+
+.kio-pin__msg {
+  min-height: 20px;
+  margin-top: 16px;
+  color: var(--di-danger);
+  font-size: 13.5px;
+  text-align: center;
+}
+
+.kio-pin__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 78px);
+  gap: 16px;
+  margin-top: 26px;
+}
+.kio-pin__grid button {
+  height: 78px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--di-ink);
+  font-size: 27px; font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+.kio-pin__grid button:active:not(:disabled) {
+  transform: scale(0.92);
+  background: rgba(245, 165, 36, 0.22);
+}
+.kio-pin__grid button:disabled { opacity: 0.4; }
+
+/* Katta ekranda tugmalar ham kattaroq — planshet uzoqroqda turadi */
+@media (min-width: 700px) and (min-height: 800px) {
+  .kio-pin__grid { grid-template-columns: repeat(3, 92px); gap: 20px; }
+  .kio-pin__grid button { height: 92px; font-size: 30px; }
+  .kio-lock__clock { font-size: 58px; }
+}
+
+/* ═══ Stop List ═══ */
+.kio-stop { padding: 12px 14px 20px; }
+
+.kio-stop__tabs {
+  display: flex; gap: 8px;
+  margin-bottom: 12px;
+}
+.kio-stop__tabs button {
+  flex: 1;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 11px 10px;
+  border-radius: 13px;
+  background: var(--di-surface);
+  border: 1px solid var(--di-line);
+  color: var(--di-muted);
+  font-size: 13.5px; font-weight: 550;
+}
+.kio-stop__tabs button.is-on {
+  background: var(--di-brand);
+  border-color: var(--di-brand);
+  color: var(--di-brand-text);
+}
+.kio-stop__tabs b {
+  min-width: 21px; padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.18);
+  font-size: 12px;
+}
+
+.kio-stop__search { margin-bottom: 12px; }
+
+.kio-stop__list { display: flex; flex-direction: column; gap: 8px; }
+
+.kio-stop__row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--di-surface);
+  border: 1px solid var(--di-line);
+}
+.kio-stop__info { flex: 1; min-width: 0; }
+.kio-stop__name {
+  font-size: 14.5px; font-weight: 550;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.kio-stop__price { margin-top: 2px; color: var(--di-muted); font-size: 12.5px; }
+
+.kio-stop__btn {
+  flex-shrink: 0;
+  display: flex; align-items: center; gap: 6px;
+  padding: 9px 14px;
+  border-radius: 11px;
+  font-size: 13px; font-weight: 600;
+}
+.kio-stop__btn.is-stop {
+  background: rgba(225, 75, 66, 0.14);
+  color: var(--di-danger);
+}
+.kio-stop__btn.is-back {
+  background: rgba(111, 191, 115, 0.14);
+  color: var(--di-success);
+}
+.kio-stop__btn:disabled { opacity: 0.5; }
+
+/* ═══ Menyu (ko'rish uchun) ═══ */
+.kio-menu { padding: 12px 14px 20px; }
+.kio-menu__cats {
+  display: flex; gap: 7px;
+  margin: 12px 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.kio-menu__cats::-webkit-scrollbar { display: none; }
+.kio-menu__cats button {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--di-surface);
+  border: 1px solid var(--di-line);
+  color: var(--di-muted);
+  font-size: 13px; font-weight: 500;
+  white-space: nowrap;
+}
+.kio-menu__cats button.is-on {
+  background: var(--di-brand);
+  border-color: var(--di-brand);
+  color: var(--di-brand-text);
+}
+
+.kio-menu__list { display: flex; flex-direction: column; gap: 8px; }
+
+.kio-menu__row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--di-surface);
+  border: 1px solid var(--di-line);
+}
+.kio-menu__row.is-off { opacity: 0.45; }
+.kio-menu__info { flex: 1; min-width: 0; }
+.kio-menu__search { margin-bottom: 0; }
+.kio-menu__right {
+  flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+}
+.kio-menu__stop {
+  display: flex; align-items: center; gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(225, 75, 66, 0.14);
+  color: var(--di-danger);
+  font-size: 11px; font-weight: 600;
+}
+.kio-menu__cats small {
+  margin-left: 4px;
+  opacity: 0.65;
+  font-size: 11px;
+}
+.kio-menu__name {
+  font-size: 14.5px; font-weight: 550;
+  display: flex; align-items: center; gap: 7px;
+}
+.kio-menu__desc {
+  margin-top: 3px;
+  color: var(--di-muted); font-size: 12.5px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.kio-menu__price {
+  color: var(--di-brand);
+  font-size: 14.5px; font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}

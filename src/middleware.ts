@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 /**
  * Domen bo'yicha yo'naltirish.
  *
- * waiter.lokma.uz → /waiter
+ * waiter.lokma.uz → /waiter, /kio/{token}
  * lokma.uz        → oddiy sayt
  *
  * Ikkala interfeys bitta repoda — alohida deploy kerak emas.
@@ -24,6 +24,11 @@ export function middleware(req: NextRequest) {
   // Statik fayllar va API o'tadi
   if (
     pathname.startsWith("/waiter")
+    // Kiosk — zaldagi planshet. Havolaning o'zi kredensial,
+    // shuning uchun bosh sahifaga yo'naltirilmasligi kerak:
+    // aks holda planshet har yangilanganda login ekraniga
+    // tushib qolardi.
+    || pathname.startsWith("/kio")
     || pathname.startsWith("/_next")
     || pathname.startsWith("/favicon")
     || /\.[a-z0-9]+$/i.test(pathname)

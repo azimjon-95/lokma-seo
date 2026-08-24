@@ -79,15 +79,36 @@ function openedAt(t: WaiterTable) {
 }
 
 export function WaiterTables({
-  me, tables, onRefresh, onLogout,
+  me, tables, onRefresh, onLogout, extraTabs, subtitle, hideLogout,
 }: {
   me: Me;
   tables: WaiterTable[];
   onRefresh: () => void;
   onLogout: () => void;
+  /*
+   * Kiosk rejimi uchun (2026-08).
+   *
+   * Kiosk ham SHU ekranni ko'radi — stollar, stol varag'i,
+   * taom tanlash bir xil. Farqi pastki menyuda: kioskda
+   * "Buyurtmalar" va "Hisobotlar" O'RNIGA "Menyu" va
+   * "Stop List" turadi. Hisobotlar — ofitsiantning shaxsiy
+   * daromadi, kiosk esa shaxsga bog'lanmagan, shuning uchun
+   * u yerda ko'rsatadigan narsa yo'q.
+   *
+   * Ekranni nusxalash o'rniga tashqi yorliqlar prop bilan
+   * uzatiladi: stol mantig'i bitta joyda qoladi.
+   */
+  extraTabs?: Array<{
+    key: string;
+    label: string;
+    Icon: React.ComponentType<{ size?: number; strokeWidth?: number }>;
+    render: () => React.ReactNode;
+  }>;
+  subtitle?: string;
+  hideLogout?: boolean;
 }) {
   const [active, setActive] = useState<WaiterTable | null>(null);
-  const [tab, setTab] = useState<"tables" | "orders" | "reports">("tables");
+  const [tab, setTab] = useState<string>("tables");
   const [sheet, setSheet] = useState<WaiterTable | null>(null);
 
   const [query, setQuery] = useState("");
@@ -150,13 +171,15 @@ export function WaiterTables({
         <div style={{ flex: 1, minWidth: 0 }}>
           <div className="di-header__rest">{me.restaurant.name}</div>
           <div className="di-header__table">
-            {me.firstName} {me.lastName}
+            {subtitle ?? `${me.firstName} ${me.lastName}`}
           </div>
         </div>
         <FullscreenButton />
-        <button onClick={onLogout} className="wt-logout">
-          Chiqish <LogOut size={15} strokeWidth={2.2} />
-        </button>
+        {!hideLogout && (
+          <button onClick={onLogout} className="wt-logout">
+            Chiqish <LogOut size={15} strokeWidth={2.2} />
+          </button>
+        )}
       </header>
 
       {tab === "tables" && (
@@ -253,20 +276,32 @@ export function WaiterTables({
         </>
       )}
 
-      {tab === "orders" && <MyWaiterOrders />}
-      {tab === "reports" && <WaiterReports me={me} />}
+      {!extraTabs && tab === "orders" && <MyWaiterOrders />}
+      {!extraTabs && tab === "reports" && <WaiterReports me={me} />}
+
+      {extraTabs?.map((t) => (
+        tab === t.key ? <div key={t.key}>{t.render()}</div> : null
+      ))}
 
       {/* Pastki menyu — Stollar o'rtada, ko'tarilgan doirada.
           U eng ko'p ishlatiladigan bo'lim, shuning uchun barmoq
           uchun eng qulay joyda turadi. */}
       <nav className="wt-nav">
-        <button
-          onClick={() => setTab("orders")}
-          className={`wt-nav__item ${tab === "orders" ? "is-on" : ""}`}
-        >
-          <ClipboardList size={21} strokeWidth={2} />
-          <span>Buyurtmalar</span>
-        </button>
+        {extraTabs ? (
+          <NavItem
+            t={extraTabs[0]}
+            active={tab === extraTabs[0]?.key}
+            onClick={() => setTab(extraTabs[0].key)}
+          />
+        ) : (
+          <button
+            onClick={() => setTab("orders")}
+            className={`wt-nav__item ${tab === "orders" ? "is-on" : ""}`}
+          >
+            <ClipboardList size={21} strokeWidth={2} />
+            <span>Buyurtmalar</span>
+          </button>
+        )}
 
         <button
           onClick={() => setTab("tables")}
@@ -279,13 +314,23 @@ export function WaiterTables({
           <span>Stollar</span>
         </button>
 
-        <button
-          onClick={() => setTab("reports")}
-          className={`wt-nav__item ${tab === "reports" ? "is-on" : ""}`}
-        >
-          <BarChart3 size={21} strokeWidth={2} />
-          <span>Hisobotlar</span>
-        </button>
+        {extraTabs ? (
+          extraTabs[1] ? (
+            <NavItem
+              t={extraTabs[1]}
+              active={tab === extraTabs[1].key}
+              onClick={() => setTab(extraTabs[1].key)}
+            />
+          ) : <span className="wt-nav__item" aria-hidden />
+        ) : (
+          <button
+            onClick={() => setTab("reports")}
+            className={`wt-nav__item ${tab === "reports" ? "is-on" : ""}`}
+          >
+            <BarChart3 size={21} strokeWidth={2} />
+            <span>Hisobotlar</span>
+          </button>
+        )}
       </nav>
 
       {sheet && (
@@ -301,6 +346,22 @@ export function WaiterTables({
         />
       )}
     </div>
+  );
+}
+
+/** Pastki menyu yorlig'i — kiosk uzatgan bo'limlar uchun. */
+function NavItem({
+  t, active, onClick,
+}: {
+  t: { label: string; Icon: React.ComponentType<{ size?: number; strokeWidth?: number }> };
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button onClick={onClick} className={`wt-nav__item ${active ? "is-on" : ""}`}>
+      <t.Icon size={21} strokeWidth={2} />
+      <span>{t.label}</span>
+    </button>
   );
 }
 

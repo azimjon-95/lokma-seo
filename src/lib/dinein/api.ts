@@ -188,16 +188,48 @@ export const dineInApi = {
     ),
 };
 
-// ═══ Ofitsiant ═══
+// ═══ Ofitsiant / Kiosk ═══
 const WAITER_TOKEN_KEY = "lokma_waiter_token";
+const KIOSK_TOKEN_KEY = "lokma_kiosk_token";
 
-export function getWaiterToken(): string | null {
+/**
+ * Ishlash rejimi.
+ *
+ * NEGA SHUNDAY: kiosk va ofitsiant BIR XIL ekranlarni ko'radi
+ * (stollar, stol varag'i, taom tanlash) — farqi faqat qaysi
+ * endpointga borishida va qaysi token bilan. Agar har bir
+ * komponentga `api` prop uzatsak, TableSheet → DishSheet →
+ * WaiterTables zanjiri bo'ylab o'nlab joyni o'zgartirish
+ * kerak bo'lardi va bitta joyni unutish oson.
+ *
+ * Shuning uchun almashtirish BITTA joyda — pastdagi `mode`.
+ * Komponentlar avvalgidek `waiterApi` ni chaqiraveradi.
+ */
+type ApiMode = "waiter" | "kiosk";
+let mode: ApiMode = "waiter";
+
+export function setApiMode(m: ApiMode) {
+  mode = m;
+}
+
+export function getApiMode(): ApiMode {
+  return mode;
+}
+
+/** Rejimga qarab yo'l boshlanishi: /waiter yoki /kiosk */
+const root = () => (mode === "kiosk" ? "/kiosk" : "/waiter");
+
+function readKey(key: string): string | null {
   if (typeof window === "undefined") return null;
   try {
-    return localStorage.getItem(WAITER_TOKEN_KEY);
+    return localStorage.getItem(key);
   } catch {
     return null;
   }
+}
+
+export function getWaiterToken(): string | null {
+  return readKey(mode === "kiosk" ? KIOSK_TOKEN_KEY : WAITER_TOKEN_KEY);
 }
 
 export function setWaiterToken(token: string) {
@@ -211,6 +243,26 @@ export function setWaiterToken(token: string) {
 export function clearWaiterToken() {
   try {
     localStorage.removeItem(WAITER_TOKEN_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+export function getKioskToken(): string | null {
+  return readKey(KIOSK_TOKEN_KEY);
+}
+
+export function setKioskToken(token: string) {
+  try {
+    localStorage.setItem(KIOSK_TOKEN_KEY, token);
+  } catch {
+    /* ignore */
+  }
+}
+
+export function clearKioskToken() {
+  try {
+    localStorage.removeItem(KIOSK_TOKEN_KEY);
   } catch {
     /* ignore */
   }
@@ -235,19 +287,19 @@ export const waiterApi = {
       earnings?: { total: number; orders: number };
     }>("/waiter/me", { auth: true }),
 
-  tables: () => request<WaiterTable[]>("/waiter/tables", { auth: true }),
+  tables: () => request<WaiterTable[]>(`${root()}/tables`, { auth: true }),
 
   menu: (restaurantId: string) =>
-    request<Dish[]>(`/waiter/menu/${restaurantId}`, { auth: true }),
+    request<Dish[]>(`${root()}/menu/${restaurantId}`, { auth: true }),
 
   setOrderStatus: (orderId: string, status: string) =>
-    request(`/waiter/orders/${orderId}/status`, {
+    request(`${root()}/orders/${orderId}/status`, {
       method: "PATCH", auth: true,
       body: JSON.stringify({ status }),
     }),
 
   closeTable: (tableId: string, force?: boolean) =>
-    request(`/waiter/tables/${tableId}/close`, {
+    request(`${root()}/tables/${tableId}/close`, {
       method: "POST", auth: true,
       body: JSON.stringify({ force }),
     }),
@@ -258,10 +310,10 @@ export const waiterApi = {
       session: { _id: string; guestCount?: number } | null;
       orders: Array<DineInOrder & { note?: string }>;
       summary: { orders: number; subtotal: number; serviceFee: number; total: number };
-    }>(`/waiter/tables/${id}`, { auth: true }),
+    }>(`${root()}/tables/${id}`, { auth: true }),
 
   setGuests: (id: string, count: number) =>
-    request<{ guestCount: number; status: string }>(`/waiter/tables/${id}/guests`, {
+    request<{ guestCount: number; status: string }>(`${root()}/tables/${id}/guests`, {
       method: "PATCH", auth: true,
       body: JSON.stringify({ count }),
     }),
@@ -279,18 +331,73 @@ export const waiterApi = {
       _id: string; type: string; status: string;
       tableId?: { tableNumber: string; tableName?: string };
       createdAt: string;
-    }>>("/waiter/requests", { auth: true }),
+    }>>(`${root()}/requests`, { auth: true }),
 
   updateRequest: (id: string, status: "accepted" | "done") =>
-    request(`/waiter/requests/${id}`, {
+    request(`${root()}/requests/${id}`, {
       method: "PATCH", auth: true,
       body: JSON.stringify({ status }),
     }),
 
   createOrder: (tableId: string, items: unknown[], note?: string) =>
-    request<DineInOrder>("/waiter/orders", {
+    request<DineInOrder>(`${root()}/orders`, {
       method: "POST",
       auth: true,
       body: JSON.stringify({ tableId, items, note }),
+    }),
+};
+
+// ═══ Kiosk (zaldagi planshet) ═══
+
+export interface KioskConfig {
+  label: string;
+  restaurant: { id: string; name: string; imageUrl?: string };
+  sections: string[];
+  autoFullscreen: boolean;
+  inactivitySec: number;
+}
+
+export interface StopDish {
+  _id: string;
+  name: string;
+  imageUrl?: string;
+  images?: string[];
+  price: number;
+  category?: string;
+  section?: string;
+  updatedAt?: string;
+}
+
+export const kioskApi = {
+  /** Sahifa ochilishida — link yaroqlimi. Sir ma'lumot qaytarmaydi. */
+  validate: (token: string) =>
+    request<KioskConfig & { valid: true }>(`/kiosk/validate/${token}`),
+
+  /** Qurilmani bog'lab, ish tokenini oladi. */
+  session: (token: string, deviceId: string, deviceLabel: string) =>
+    request<KioskConfig & { token: string }>("/kiosk/session", {
+      method: "POST",
+      body: JSON.stringify({ token, deviceId, deviceLabel }),
+    }),
+
+  /** Link hali tirikmi — admin o'chirgan bo'lsa kiosk buni biladi. */
+  me: () =>
+    request<KioskConfig & { restaurantId: string }>("/kiosk/me", { auth: true }),
+
+  /** Qulfni ochish. Xato hisobi SERVERDA yuritiladi. */
+  verifyPin: (pin: string) =>
+    request<{ ok: true }>("/kiosk/pin", {
+      method: "POST", auth: true,
+      body: JSON.stringify({ pin }),
+    }),
+
+  stopList: () => request<StopDish[]>("/kiosk/stoplist", { auth: true }),
+
+  allDishes: () => request<StopDish[]>("/kiosk/dishes", { auth: true }),
+
+  toggleStop: (dishId: string, stop: boolean) =>
+    request(`/kiosk/dishes/${dishId}/stop`, {
+      method: "PATCH", auth: true,
+      body: JSON.stringify({ stop }),
     }),
 };
