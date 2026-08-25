@@ -27,45 +27,55 @@ interface OrderLine {
   quantity: number;
   options: DishOption[];
   unitPrice: number;
+
+  /*
+   * Izoh, olib ketish va kurs — HAR QATOR uchun alohida.
+   *
+   * Shuning uchun ular `key` ga ham kiradi: bir xil taom
+   * turli izoh yoki turli kurs bilan buyurtma qilinishi
+   * mumkin va ular BIRLASHIB KETMASLIGI kerak. Masalan
+   * "2 ta lag'mon: bittasi shu yerda, bittasi olib ketishga".
+   */
+  note: string;
+  takeaway: boolean;
+  course: number;
 }
 
-const TABLE_STATUS: Record<string, string> = {
-  available: "Bo'sh",
-  occupied: "Band",
-  ordering: "Buyurtma",
-  waiting: "Kutmoqda",
-  closed: "Yopiq",
-};
-
 /* ═══════════════════════════════════════════
-   Stol holatlari
+   STOL HOLATLARI — ATIGI 3 TA
 
-   Bazadagi status (available/occupied/ordering/waiting/closed)
-   ofitsiant uchun tushunarli beshta holatga keltiriladi.
-   "Hisob so'ralgan" alohida: u stol statusi emas, mijozning
-   so'rovi (TableRequest type='bill').
+     free      Bo'sh        yashil
+     reserved  Kutilmoqda   sariq   (bron qilingan, mehmon kelmagan)
+     occupied  Band         qizil   (mehmon o'tirgan)
+
+   Ilgari 5 ta edi va ulardan ikkitasi ('ordering', 'waiting')
+   aslida holat emas, jarayon belgisi edi — ikkalasida ham stol
+   band. Natijada zal xaritasida bir xil band stol uch xil
+   rangda ko'rinardi.
+
+   Hisob so'ralgani ham holat emas: mehmon hamon o'tiribdi.
+   U TableRequest (type: 'bill') orqali keladi va stol ustidagi
+   BELGI sifatida ko'rsatiladi, rangini o'zgartirmaydi.
    ═══════════════════════════════════════════ */
 type LucideIcon = typeof Armchair;
 
-type State = "free" | "pending" | "busy" | "bill" | "closed";
+type State = "free" | "reserved" | "occupied";
 
 const STATE: Record<State, {
   label: string; color: string; Icon: LucideIcon; action: string;
 }> = {
-  free:    { label: "Bo'sh",           color: "#34C759", Icon: Armchair, action: "Stolni ochish" },
-  pending: { label: "Kutilmoqda",      color: "#F5A524", Icon: Timer,    action: "Buyurtmani ko'rish" },
-  busy:    { label: "Band",            color: "#E14B42", Icon: Users,    action: "Buyurtmani ko'rish" },
-  bill:    { label: "Hisob so'ralgan", color: "#3B82F6", Icon: Receipt,  action: "Hisob chiqarish" },
-  closed:  { label: "Yopilgan",        color: "#8E8E93", Icon: CircleX,  action: "Yopiq" },
+  free:     { label: "Bo'sh",      color: "#34C759", Icon: Armchair, action: "Stolni ochish" },
+  reserved: { label: "Kutilmoqda", color: "#F5A524", Icon: Timer,    action: "Mehmonni qabul qilish" },
+  occupied: { label: "Band",       color: "#E14B42", Icon: Users,    action: "Buyurtmani ko'rish" },
 };
 
-const ORDER: State[] = ["free", "pending", "busy", "bill", "closed"];
+const ORDER: State[] = ["free", "reserved", "occupied"];
 
-function stateOf(t: WaiterTable, billTables: Set<string>): State {
-  if (billTables.has(t._id)) return "bill";
-  if (t.status === "closed") return "closed";
-  if (t.status === "ordering" || t.status === "waiting") return "pending";
-  if (t.isBusy || t.status === "occupied" || (t.guestCount || 0) > 0) return "busy";
+function stateOf(t: WaiterTable): State {
+  if (t.status === "reserved") return "reserved";
+  // isBusy va guestCount — zaxira belgilar: sessiya ochilgan
+  // bo'lsa-yu status hali yozilmagan bo'lsa ham stol band
+  if (t.isBusy || t.status === "occupied" || (t.guestCount || 0) > 0) return "occupied";
   return "free";
 }
 
@@ -109,6 +119,8 @@ export function WaiterTables({
   hideLogout?: boolean;
 }) {
   const [active, setActive] = useState<WaiterTable | null>(null);
+  // Mehmon soni so'ralayotgan stol (bo'sh stol ochilganda)
+  const [guestFor, setGuestFor] = useState<WaiterTable | null>(null);
   const [tab, setTab] = useState<string>("tables");
   const [sheet, setSheet] = useState<WaiterTable | null>(null);
 
@@ -140,12 +152,12 @@ export function WaiterTables({
   }, [onRefresh, loadRequests]);
 
   const counts = ORDER.reduce((acc, k) => {
-    acc[k] = tables.filter((t) => stateOf(t, billTables) === k).length;
+    acc[k] = tables.filter((t) => stateOf(t) === k).length;
     return acc;
   }, {} as Record<State, number>);
 
   const visible = tables.filter((t) => {
-    if (filter !== "all" && stateOf(t, billTables) !== filter) return false;
+    if (filter !== "all" && stateOf(t) !== filter) return false;
     if (!query.trim()) return true;
     const q = query.trim().toLowerCase();
     return `${t.tableNumber} ${t.tableName || ""}`.toLowerCase().includes(q);
@@ -161,8 +173,28 @@ export function WaiterTables({
     );
   }
 
+  const guestModal = guestFor && (
+    <GuestCountSheet
+      table={guestFor}
+      onClose={() => setGuestFor(null)}
+      onDone={(t) => { setGuestFor(null); setActive(t); onRefresh(); }}
+    />
+  );
+
+  /*
+   * Bo'sh stolga bosilsa AVVAL mehmon soni so'raladi.
+   *
+   * Nega bu majburiy qadam: xizmat haqi va hisob mehmon
+   * soniga bog'liq, ustiga zal xaritasida "4 kishilik stolda
+   * 6 kishi" kabi holat ko'rinib turishi kerak. Ilgari
+   * to'g'ridan-to'g'ri menyu ochilardi va mehmon soni ko'pincha
+   * kiritilmay qolardi — keyin hisob noto'g'ri chiqardi.
+   *
+   * Band stolda esa so'ralmaydi: soni allaqachon kiritilgan,
+   * uni stol varag'idan o'zgartirish mumkin.
+   */
   const openTable = (t: WaiterTable) => {
-    if (stateOf(t, billTables) === "free") setActive(t);
+    if (stateOf(t) === "free") setGuestFor(t);
     else setSheet(t);
   };
 
@@ -266,7 +298,7 @@ export function WaiterTables({
                   <TableCard
                     key={t._id}
                     table={t}
-                    state={stateOf(t, billTables)}
+                    state={stateOf(t)}
                     onOpen={() => openTable(t)}
                     onMenu={() => setSheet(t)}
                     compact={compact}
@@ -334,6 +366,8 @@ export function WaiterTables({
           </button>
         )}
       </nav>
+
+      {guestModal}
 
       {sheet && (
         <TableSheet
@@ -485,7 +519,7 @@ function TableCard({
 
       <div className="wt-card__sum">{som(t.orderTotal || 0)}</div>
 
-      <button onClick={onOpen} className="wt-card__cta" disabled={state === "closed"}>
+      <button onClick={onOpen} className="wt-card__cta">
         <span>{st.action}</span>
         {state === "free"
           ? <Plus size={15} strokeWidth={2.6} />
@@ -546,6 +580,292 @@ function WaiterReports({ me }: { me: Me }) {
 }
 
 /** Stol uchun buyurtma yaratish. */
+/* ═══════════════════════════════════════════════════════════
+   MEHMON SONI
+
+   Bo'sh stol ochilganda birinchi qadam. Soni serverga
+   yoziladi va stol 'occupied' ga o'tadi — shundan keyingina
+   menyu ochiladi.
+
+   Nega alohida qadam: xizmat haqi va hisob mehmon soniga
+   bog'liq. Ilgari menyu darhol ochilardi va son ko'pincha
+   kiritilmay qolardi, keyin hisob noto'g'ri chiqardi.
+   ═══════════════════════════════════════════════════════════ */
+function GuestCountSheet({
+  table, onClose, onDone,
+}: {
+  table: WaiterTable;
+  onClose: () => void;
+  onDone: (t: WaiterTable) => void;
+}) {
+  const capacity = table.capacity || 4;
+  const [count, setCount] = useState(Math.min(2, capacity));
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
+  const go = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      await waiterApi.setGuests(table._id, count);
+      onDone({ ...table, guestCount: count, status: "occupied", isBusy: true });
+    } catch (e) {
+      setError((e as ApiError).message);
+      setBusy(false);
+    }
+  };
+
+  // Sig'imdan ko'p bo'lishi MUMKIN — real zalda stul qo'shiladi.
+  // Faqat ogohlantiramiz, taqiqlamaymiz.
+  const over = count > capacity;
+
+  return (
+    <div className="di-sheet-wrap" onClick={onClose} role="presentation">
+      <div
+        className="di-sheet wt-guest"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-label="Mehmon soni"
+      >
+        <header className="wt-review__head">
+          <div>
+            <div className="wt-review__title">
+              {table.tableName || `Stol ${table.tableNumber}`}
+            </div>
+            <div className="wt-review__sub">Necha kishi?</div>
+          </div>
+          <button onClick={onClose} className="di-sheet__close" aria-label="Yopish">✕</button>
+        </header>
+
+        <div className="wt-guest__pick">
+          <button
+            onClick={() => setCount((n) => Math.max(1, n - 1))}
+            aria-label="Kamaytirish"
+          >−</button>
+          <div className="wt-guest__num">
+            <b>{count}</b>
+            <span>/ {capacity} joy</span>
+          </div>
+          <button
+            onClick={() => setCount((n) => Math.min(30, n + 1))}
+            aria-label="Ko\u2018paytirish"
+          >+</button>
+        </div>
+
+        <div className="wt-guest__quick">
+          {Array.from({ length: Math.min(8, capacity + 2) }, (_, i) => i + 1).map((n) => (
+            <button
+              key={n}
+              onClick={() => setCount(n)}
+              className={count === n ? "is-on" : ""}
+            >{n}</button>
+          ))}
+        </div>
+
+        {over && (
+          <p className="wt-guest__warn">
+            Sig\u2018imdan {count - capacity} kishi ko\u2018p — stul qo\u2018shish kerak
+          </p>
+        )}
+
+        {error && <div className="wt-error" role="alert"><span>{error}</span></div>}
+
+        <button onClick={go} disabled={busy} className="wt-review__send">
+          {busy ? "Ochilmoqda..." : "Davom etish"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TEKSHIRISH PANELI
+
+   Yuborishdan oldingi oxirgi qadam. Shu yerda har bir taomga:
+     • izoh          — "avokadosiz", "achchiq qilmang"
+     • olib ketish   — shu taom, butun buyurtma emas
+     • kurs          — qaysi navbatda kelishi
+
+   Nega alohida ekran, nega taom tanlashda emas:
+   zalda ofitsiant avval tez tanlaydi (mijoz aytib turadi),
+   keyin bir joyda hammasini birga ko'rib chiqadi. Har taomni
+   tanlashda uch xil sozlama so'rasak, tanlash sekinlashadi.
+   ═══════════════════════════════════════════════════════════ */
+
+const COURSE_LABEL = ["", "1-kurs", "2-kurs", "3-kurs", "4-kurs", "5-kurs"];
+
+function ReviewSheet({
+  lines, subtotal, sending, onClose, onPatch, onQty, onSubmit,
+}: {
+  lines: OrderLine[];
+  subtotal: number;
+  sending: boolean;
+  onClose: () => void;
+  onPatch: (
+    key: string,
+    patch: Partial<Pick<OrderLine, "note" | "takeaway" | "course">>,
+  ) => void;
+  onQty: (key: string, qty: number) => void;
+  onSubmit: () => void;
+}) {
+  const [editing, setEditing] = useState<string | null>(null);
+
+  // Orqa fon scroll bo'lmasin
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
+  /*
+   * Kurslar bo'yicha guruhlash — oshxona ham xuddi shunday
+   * ko'radi, shuning uchun ofitsiant yuborishdan oldin
+   * aynan o'sha ko'rinishni tekshiradi.
+   */
+  const byCourse = new Map<number, OrderLine[]>();
+  for (const l of lines) {
+    const list = byCourse.get(l.course) || [];
+    list.push(l);
+    byCourse.set(l.course, list);
+  }
+  const courses = Array.from(byCourse.keys()).sort((a, b) => a - b);
+
+  // Mavjud eng katta kursdan bitta ko'p taklif qilinadi:
+  // 5 ta kurs bir vaqtda kerak bo'lishi juda kam uchraydi
+  const maxCourse = Math.min(5, Math.max(...lines.map((l) => l.course), 1) + 1);
+
+  return (
+    <div className="di-sheet-wrap" onClick={onClose} role="presentation">
+      <div
+        className="di-sheet wt-review"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-label="Buyurtmani tekshirish"
+      >
+        <header className="wt-review__head">
+          <div>
+            <div className="wt-review__title">Buyurtmani tekshiring</div>
+            <div className="wt-review__sub">
+              {lines.reduce((n, l) => n + l.quantity, 0)} ta taom
+              {courses.length > 1 && ` \u00b7 ${courses.length} kurs`}
+            </div>
+          </div>
+          <button onClick={onClose} className="di-sheet__close" aria-label="Yopish">✕</button>
+        </header>
+
+        <div className="wt-review__body">
+          {courses.map((c) => (
+            <section key={c} className="wt-review__course">
+              {courses.length > 1 && (
+                <div className="wt-review__course-head">
+                  {COURSE_LABEL[c] || `${c}-kurs`}
+                  {c > 1 && <span>keyinroq tayyorlanadi</span>}
+                </div>
+              )}
+
+              {byCourse.get(c)!.map((l) => (
+                <div key={l.key} className="wt-line">
+                  <div className="wt-line__top">
+                    <div className="wt-line__name">
+                      {l.dish.name}
+                      {l.takeaway && <span className="wt-tag wt-tag--tw">Olib ketish</span>}
+                    </div>
+
+                    <div className="di-qty di-qty--sm">
+                      <button onClick={() => onQty(l.key, l.quantity - 1)} aria-label="Kamaytirish">−</button>
+                      <span>{l.quantity}</span>
+                      <button onClick={() => onQty(l.key, l.quantity + 1)} aria-label="Ko\u2018paytirish">+</button>
+                    </div>
+                  </div>
+
+                  {l.options.length > 0 && (
+                    <div className="wt-line__opts">
+                      {l.options.map((o) => o.name).join(", ")}
+                    </div>
+                  )}
+
+                  {l.note && <div className="wt-line__note">\u270e {l.note}</div>}
+
+                  <div className="wt-line__tools">
+                    <button
+                      onClick={() => setEditing(editing === l.key ? null : l.key)}
+                      className={`wt-tool ${l.note ? "is-on" : ""}`}
+                    >
+                      {l.note ? "Izohni o\u2018zgartirish" : "Izoh"}
+                    </button>
+
+                    <button
+                      onClick={() => onPatch(l.key, { takeaway: !l.takeaway })}
+                      className={`wt-tool ${l.takeaway ? "is-on" : ""}`}
+                    >
+                      Olib ketish
+                    </button>
+
+                    <select
+                      value={l.course}
+                      onChange={(e) => onPatch(l.key, { course: Number(e.target.value) })}
+                      className="wt-tool wt-tool--sel"
+                      aria-label="Kurs"
+                    >
+                      {Array.from({ length: maxCourse }, (_, i) => i + 1).map((n) => (
+                        <option key={n} value={n}>{COURSE_LABEL[n] || `${n}-kurs`}</option>
+                      ))}
+                    </select>
+
+                    <span className="wt-line__sum">{som(l.unitPrice * l.quantity)}</span>
+                  </div>
+
+                  {editing === l.key && (
+                    <input
+                      autoFocus
+                      defaultValue={l.note}
+                      placeholder="Masalan: avokadosiz, achchiq qilmang"
+                      maxLength={200}
+                      className="wt-line__input"
+                      onBlur={(e) => {
+                        onPatch(l.key, { note: e.target.value });
+                        setEditing(null);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                        if (e.key === "Escape") setEditing(null);
+                      }}
+                    />
+                  )}
+                </div>
+              ))}
+            </section>
+          ))}
+        </div>
+
+        <footer className="wt-review__foot">
+          <div className="wt-review__total">
+            <span>Jami</span>
+            <b>{som(subtotal)} so\u2018m</b>
+          </div>
+
+          {courses.length > 1 && (
+            <p className="wt-review__hint">
+              Oshxonaga hozir faqat {COURSE_LABEL[courses[0]] || "1-kurs"} yuboriladi.
+              Qolganlari tayyor bo\u2018lganda siz yuborasiz.
+            </p>
+          )}
+
+          <button onClick={onSubmit} disabled={sending} className="wt-review__send">
+            {sending ? "Yuborilmoqda..." : "Oshxonaga yuborish"}
+          </button>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
 function WaiterOrder({
   table, restaurantId, onBack,
 }: {
@@ -560,6 +880,8 @@ function WaiterOrder({
   const [section, setSection] = useState("all");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Tekshirish paneli — yuborishdan oldingi oxirgi qadam
+  const [review, setReview] = useState(false);
 
   useEffect(() => {
     cached(`menu:${restaurantId}`, () => waiterApi.menu(restaurantId))
@@ -576,15 +898,76 @@ function WaiterOrder({
     ? dishes
     : dishes.filter((d) => (d.section || d.category) === section);
 
-  const addLine = useCallback((dish: Dish, quantity: number, options: DishOption[]) => {
-    const key = `${dish._id}__${options.map((o) => o.name).sort().join("|")}`;
+  /*
+   * Qator kaliti — nima BIRLASHISHINI belgilaydi.
+   *
+   * Variantlardan tashqari izoh, olib ketish va kurs ham
+   * kalitga kiradi. Aks holda "1 ta lag'mon shu yerda" va
+   * "1 ta lag'mon olib ketishga" bitta qatorga qo'shilib,
+   * oshxonaga 2 ta oddiy lag'mon ketardi.
+   */
+  const lineKey = (
+    dish: Dish, options: DishOption[], note: string, takeaway: boolean, course: number,
+  ) => [
+    dish._id,
+    options.map((o) => o.name).sort().join("|"),
+    note.trim().toLowerCase(),
+    takeaway ? "tw" : "in",
+    course,
+  ].join("__");
+
+  const addLine = useCallback((
+    dish: Dish,
+    quantity: number,
+    options: DishOption[],
+    opts?: { note?: string; takeaway?: boolean; course?: number },
+  ) => {
+    const note = opts?.note ?? "";
+    const takeaway = opts?.takeaway ?? false;
+    const course = opts?.course ?? 1;
+    const key = lineKey(dish, options, note, takeaway, course);
+
     setLines((prev) => {
       const found = prev.find((l) => l.key === key);
       if (found) {
         return prev.map((l) => (l.key === key ? { ...l, quantity: l.quantity + quantity } : l));
       }
       const optPrice = options.reduce((s, o) => s + (o.price || 0), 0);
-      return [...prev, { key, dish, quantity, options, unitPrice: dish.price + optPrice }];
+      return [...prev, {
+        key, dish, quantity, options,
+        unitPrice: dish.price + optPrice,
+        note, takeaway, course,
+      }];
+    });
+  }, []);
+
+  /*
+   * Qatorni tahrirlash — izoh/olib ketish/kurs o'zgarsa
+   * kalit ham o'zgaradi. Yangi kalit allaqachon bo'lsa
+   * qatorlar birlashtiriladi, aks holda ro'yxatda ikkita
+   * bir xil qator paydo bo'lardi.
+   */
+  const patchLine = useCallback((
+    key: string,
+    patch: Partial<Pick<OrderLine, "note" | "takeaway" | "course">>,
+  ) => {
+    setLines((prev) => {
+      const line = prev.find((l) => l.key === key);
+      if (!line) return prev;
+
+      const next = { ...line, ...patch };
+      const newKey = lineKey(next.dish, next.options, next.note, next.takeaway, next.course);
+      if (newKey === key) return prev;
+
+      const twin = prev.find((l) => l.key === newKey);
+      if (twin) {
+        return prev
+          .filter((l) => l.key !== key)
+          .map((l) => (l.key === newKey
+            ? { ...l, quantity: l.quantity + line.quantity }
+            : l));
+      }
+      return prev.map((l) => (l.key === key ? { ...next, key: newKey } : l));
     });
   }, []);
 
@@ -640,6 +1023,9 @@ function WaiterOrder({
           dishId: l.dish._id,
           quantity: l.quantity,
           selectedOptions: l.options.map((o) => ({ name: o.name })),
+          note: l.note || undefined,
+          takeaway: l.takeaway || undefined,
+          course: l.course,
         })),
       );
       onBack();
@@ -745,14 +1131,27 @@ function WaiterOrder({
         </div>
       )}
 
+      {/* Savat tugmasi DARHOL yubormaydi — avval tekshirish
+          paneli ochiladi. Zalda xato buyurtma oshxonaga ketsa
+          uni qaytarib bo'lmaydi, mahsulot esa isrof bo'ladi. */}
       {count > 0 && (
-        <button onClick={submit} disabled={sending} className="di-cartbar">
+        <button onClick={() => setReview(true)} className="di-cartbar">
           <span className="di-cartbar__count">{count}</span>
-          <span className="di-cartbar__label">
-            {sending ? "Yuborilmoqda..." : "Buyurtma berish"}
-          </span>
+          <span className="di-cartbar__label">Tekshirish</span>
           <span className="di-cartbar__total">{num(subtotal)}</span>
         </button>
+      )}
+
+      {review && (
+        <ReviewSheet
+          lines={lines}
+          subtotal={subtotal}
+          sending={sending}
+          onClose={() => setReview(false)}
+          onPatch={patchLine}
+          onQty={setQty}
+          onSubmit={submit}
+        />
       )}
 
       {openDish && (

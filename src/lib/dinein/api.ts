@@ -155,7 +155,7 @@ export const dineInApi = {
   menu: (restaurantId: string) =>
     request<Dish[]>(`/dine-in/menu/${restaurantId}`),
 
-  createOrder: (sessionId: string, items: unknown[], note?: string) =>
+  createOrder: (sessionId: string, items: OrderItemInput[], note?: string) =>
     request<DineInOrder>("/dine-in/orders", {
       method: "POST",
       body: JSON.stringify({ sessionId, items, note }),
@@ -268,6 +268,26 @@ export function clearKioskToken() {
   }
 }
 
+/**
+ * Buyurtmaga yuboriladigan taom.
+ *
+ * `unknown[]` ATAYLAB almashtirildi: u bilan noto'g'ri maydon
+ * nomi (masalan `takeAway` o'rniga `takeaway`) kompilyatsiyada
+ * o'tib ketardi va xato faqat zalda, oshxonaga noto'g'ri chek
+ * chiqqanda ma'lum bo'lardi.
+ */
+export interface OrderItemInput {
+  dishId: string;
+  quantity: number;
+  selectedOptions?: Array<{ name: string }>;
+  /** Taomga izoh: "avokadosiz" */
+  note?: string;
+  /** Shu taom olib ketiladimi (butun buyurtma emas) */
+  takeaway?: boolean;
+  /** Podacha: 1 = darhol, 2+ = keyinroq */
+  course?: number;
+}
+
 export const waiterApi = {
   login: (login: string, password: string, deviceId: string, deviceLabel: string) =>
     request<{
@@ -339,11 +359,19 @@ export const waiterApi = {
       body: JSON.stringify({ status }),
     }),
 
-  createOrder: (tableId: string, items: unknown[], note?: string) =>
+  createOrder: (tableId: string, items: OrderItemInput[], note?: string) =>
     request<DineInOrder>(`${root()}/orders`, {
       method: "POST",
       auth: true,
       body: JSON.stringify({ tableId, items, note }),
+    }),
+
+  /** Keyingi kursni oshxonaga yuborish. */
+  fireCourse: (orderId: string, course: number) =>
+    request<{ ok: true; firedCourses: number[] }>(`${root()}/orders/${orderId}/fire`, {
+      method: "PATCH",
+      auth: true,
+      body: JSON.stringify({ course }),
     }),
 };
 
