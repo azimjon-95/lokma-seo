@@ -626,9 +626,9 @@ function GuestCountSheet({
   const over = count > capacity;
 
   return (
-    <div className="di-sheet-wrap" onClick={onClose} role="presentation">
+    <div className="di-sheet" onClick={onClose} role="presentation">
       <div
-        className="di-sheet wt-guest"
+        className="di-sheet__box wt-guest"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-label="Mehmon soni"
@@ -741,9 +741,9 @@ function ReviewSheet({
   const maxCourse = Math.min(5, Math.max(...lines.map((l) => l.course), 1) + 1);
 
   return (
-    <div className="di-sheet-wrap" onClick={onClose} role="presentation">
+    <div className="di-sheet" onClick={onClose} role="presentation">
       <div
-        className="di-sheet wt-review"
+        className="di-sheet__box wt-review"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-label="Buyurtmani tekshirish"

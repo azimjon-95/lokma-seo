@@ -172,6 +172,14 @@ export function WaiterApp() {
       tables={tables}
       onRefresh={loadTables}
       onLogout={logout}
+      /*
+        Ixcham kartalar — kiosk bilan bir xil.
+        Ofitsiant telefonda ishlaydi: katta kartada ekranga
+        2 ta stol sig'ardi va zalni ko'rish uchun uzoq
+        aylantirish kerak edi. Endi kartaning O'ZI tugma,
+        ichidagi mayda tugmalar yo'q.
+      */
+      compact
     />
   );
 }
