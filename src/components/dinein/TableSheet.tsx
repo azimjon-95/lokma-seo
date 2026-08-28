@@ -274,7 +274,12 @@ function OrderCourses({
               <div className="ts-course__head">
                 <span className="ts-course__label">
                   {c}-kurs
-                  {!isFired && <i>keyinroq</i>}
+                  {/*
+                    Matn oshxona ekranidagi bilan BIR XIL:
+                    ofitsiant va oshxona bir narsani boshqacha
+                    atashsa, telefonda gaplashganda chalkashadi.
+                  */}
+                  <i>{isFired ? "tayyorlanmoqda" : "tayyorgarlik"}</i>
                 </span>
 
                 {!isFired && !closed && (
@@ -283,7 +288,7 @@ function OrderCourses({
                     disabled={busy}
                     className="ts-course__fire"
                   >
-                    Tayyorlash
+                    Ruxsat berish
                   </button>
                 )}
               </div>
