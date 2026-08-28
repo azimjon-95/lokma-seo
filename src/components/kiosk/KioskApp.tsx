@@ -93,7 +93,7 @@ export function KioskApp({ token }: { token: string }) {
         if (!alive) return;
         const err = e as ApiError;
         clearKioskToken();
-        setError({ message: err.message || "Ulanib bo\u2018lmadi", code: err.code });
+        setError({ message: err.message || "Ulanib bo‘lmadi", code: err.code });
         setPhase("error");
       }
     })();

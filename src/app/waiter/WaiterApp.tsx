@@ -56,6 +56,16 @@ export function WaiterApp() {
     boot();
   }, [boot]);
 
+  /*
+   * Oq mavzu — kiosk bilan bir xil palitra.
+   * Sinf <html> ga qo'yiladi, chunki sheet va modallar
+   * `position: fixed` bilan DOM'ning boshqa joyida chiziladi.
+   */
+  useEffect(() => {
+    document.documentElement.classList.add("wt-ui");
+    return () => document.documentElement.classList.remove("wt-ui");
+  }, []);
+
   // Real vaqt: stol holati, yangi buyurtma, chaqiruv
   useEffect(() => {
     if (!me) return undefined;
@@ -63,20 +73,69 @@ export function WaiterApp() {
     const s = getWaiterSocket();
     s.emit("join:restaurant", me.restaurantId);
 
-    const refresh = () => loadTables();
-    s.on("table:update", refresh);
-    s.on("dinein:new", refresh);
-    s.on("dinein:order", refresh);
-    s.on("dinein:request", refresh);
+    /*
+     * ═══ STOL HOLATI DARHOL O'ZGARSIN ═══
+     *
+     * MUAMMO: har socket hodisasida loadTables() chaqirilardi,
+     * ya'ni butun ro'yxat serverdan qayta so'ralardi. Ofitsiant
+     * stolni yopgach ranggi o'zgarishi uchun to'liq yo'l-yo'lakay
+     * (so'rov -> javob -> qayta chizish) kutilardi. Sekin
+     * internetda bu 1-2 soniya, zalda esa bu juda uzoq —
+     * xodim tugmani yana bosardi.
+     *
+     * SERVER YANGI HOLATNI HODISA ICHIDA YUBORADI:
+     *   { tableId, status }
+     * Shuning uchun uni SO'ROVSIZ, joyida qo'llash mumkin.
+     *
+     * To'liq so'rov zaxira sifatida qoladi, lekin 400 ms
+     * kechiktirib: bir necha hodisa ketma-ket kelsa (stol
+     * yopilishi bir vaqtda bir necha hodisa yuboradi) bitta
+     * so'rov ketadi, beshta emas.
+     */
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const refreshSoon = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => loadTables(), 400);
+    };
 
-    const onConnect = () => s.emit("join:restaurant", me.restaurantId);
+    const onTableUpdate = (p: { tableId?: string; status?: string }) => {
+      if (p?.tableId && p?.status) {
+        // Darhol — kutmasdan
+        setTables((prev) => prev.map((t) => (
+          t._id === p.tableId
+            ? {
+              ...t,
+              status: p.status!,
+              // isBusy stateOf() da ishlatiladi: status 'free'
+              // bo'lsa-yu isBusy true qolsa stol band ko'rinardi
+              isBusy: p.status === "occupied",
+              ...(p.status === "free" ? { guestCount: 0, orderTotal: 0 } : {}),
+            }
+            : t
+        )));
+      }
+      // Qolgan maydonlar (summa, mehmon soni) uchun zaxira
+      refreshSoon();
+    };
+
+    s.on("table:update", onTableUpdate);
+    s.on("dinein:new", refreshSoon);
+    s.on("dinein:order", refreshSoon);
+    s.on("dinein:request", refreshSoon);
+
+    const onConnect = () => {
+      s.emit("join:restaurant", me.restaurantId);
+      // Uzilib qolgan vaqtdagi o'zgarishlarni qo'lga kiritamiz
+      loadTables();
+    };
     s.on("connect", onConnect);
 
     return () => {
-      s.off("table:update", refresh);
-      s.off("dinein:new", refresh);
-      s.off("dinein:order", refresh);
-      s.off("dinein:request", refresh);
+      if (timer) clearTimeout(timer);
+      s.off("table:update", onTableUpdate);
+      s.off("dinein:new", refreshSoon);
+      s.off("dinein:order", refreshSoon);
+      s.off("dinein:request", refreshSoon);
       s.off("connect", onConnect);
     };
   }, [me, loadTables]);

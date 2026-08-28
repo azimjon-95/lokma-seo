@@ -2268,10 +2268,14 @@ select {
    joyda turadi — o'rovchi div'ga qo'ysak ular qora
    qolib ketardi.
 
-   Ofitsiant paneliga TEGMAYDI: u bu sinfsiz ochiladi.
+   Kiosk (`kio-ui`) va ofitsiant (`wt-ui`) bir xil palitrani
+   oladi: xodim planshetdan telefoniga o'tganda ko'rinish
+   o'zgarmaydi. Ikkalasi ham yorug' zalda ishlatiladi —
+   qora ekran quyoshda aks etadi va o'qilmaydi.
    ══════════════════════════════════════════════════════ */
 
-html.kio-ui {
+html.kio-ui,
+html.wt-ui {
   --di-bg: #F6F3EF;          /* iliq oq — sof oq ekran charchatadi */
   --di-surface: #FFFFFF;
   --di-surface-2: #EFEAE3;
@@ -2300,16 +2304,21 @@ html.kio-ui {
 
 /* Kartalar oq fonda "suzib" turmasligi uchun — yumshoq soya */
 html.kio-ui .wt-card,
+html.wt-ui .wt-card,
 html.kio-ui .kio-stop__row,
-html.kio-ui .kio-menu__row {
+html.wt-ui .kio-stop__row,
+html.kio-ui .kio-menu__row,
+html.wt-ui .kio-menu__row {
   box-shadow: 0 1px 2px rgba(28, 22, 16, 0.05);
 }
 
 /* Stol raqami yog'och disk ustida — oq mavzuda qora yozuv */
-html.kio-ui .wt-card__disc { color: #2A1F14; }
+html.kio-ui .wt-card__disc,
+html.wt-ui .wt-card__disc { color: #2A1F14; }
 
 /* Pastki menyudagi doira oq fonda ham ajralib tursin */
-html.kio-ui .wt-nav__disc {
+html.kio-ui .wt-nav__disc,
+html.wt-ui .wt-nav__disc {
   color: #FFFFFF;
   background: radial-gradient(circle at 50% 22%, #E8A63C 0%, #C97A12 46%, #9A5A08 100%);
   box-shadow:
@@ -2320,14 +2329,20 @@ html.kio-ui .wt-nav__disc {
 }
 
 /* Qulf ekrani oq mavzuda */
-html.kio-ui .kio-lock { color: var(--di-ink); }
-html.kio-ui .kio-lock__disc { color: #FFFFFF; }
-html.kio-ui .kio-pin__dots span { border-color: rgba(28, 22, 16, 0.25); }
-html.kio-ui .kio-pin__grid button { background: rgba(28, 22, 16, 0.05); }
-html.kio-ui .kio-pin__grid button:active:not(:disabled) {
+html.kio-ui .kio-lock,
+html.wt-ui .kio-lock { color: var(--di-ink); }
+html.kio-ui .kio-lock__disc,
+html.wt-ui .kio-lock__disc { color: #FFFFFF; }
+html.kio-ui .kio-pin__dots span,
+html.wt-ui .kio-pin__dots span { border-color: rgba(28, 22, 16, 0.25); }
+html.kio-ui .kio-pin__grid button,
+html.wt-ui .kio-pin__grid button { background: rgba(28, 22, 16, 0.05); }
+html.kio-ui .kio-pin__grid button:active:not(:disabled),
+html.wt-ui .kio-pin__grid button:active:not(:disabled) {
   background: rgba(201, 122, 18, 0.16);
 }
-html.kio-ui .kio-lock__hint { background: rgba(28, 22, 16, 0.03); }
+html.kio-ui .kio-lock__hint,
+html.wt-ui .kio-lock__hint { background: rgba(28, 22, 16, 0.03); }
 
 /* ─── IXCHAM STOL KARTALARI (kiosk) ───
    Kartaning o'zi tugma: tepadagi "⋮" va pastdagi katta tugma
@@ -2335,12 +2350,14 @@ html.kio-ui .kio-lock__hint { background: rgba(28, 22, 16, 0.03); }
    bilan ko'rsatiladi — matnli nishon karta balandligining
    uchdan birini yeb turardi. */
 
-html.kio-ui .wt-grid {
+html.kio-ui .wt-grid,
+html.wt-ui .wt-grid {
   grid-template-columns: repeat(auto-fill, minmax(116px, 1fr));
   gap: 8px;
 }
 
-html.kio-ui .wt-card--mini {
+html.kio-ui .wt-card--mini,
+html.wt-ui .wt-card--mini {
   position: relative;
   overflow: hidden;
   padding: 10px 8px 9px;
@@ -2350,14 +2367,16 @@ html.kio-ui .wt-card--mini {
   -webkit-tap-highlight-color: transparent;
   transition: transform 0.14s ease, box-shadow 0.14s ease;
 }
-html.kio-ui .wt-card--mini:active {
+html.kio-ui .wt-card--mini:active,
+html.wt-ui .wt-card--mini:active {
   transform: scale(0.965);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--c) 45%, transparent);
 }
 
 /* Holat — chap chekkadagi chiziq. Bo'sh stolda ham bor,
    shuning uchun ko'z bir qarashda zalni "o'qiy" oladi. */
-html.kio-ui .wt-card--mini::before {
+html.kio-ui .wt-card--mini::before,
+html.wt-ui .wt-card--mini::before {
   content: "";
   position: absolute; left: 0; top: 0; bottom: 0;
   width: 3.5px;
@@ -2366,47 +2385,56 @@ html.kio-ui .wt-card--mini::before {
 
 /* Chizma: disk 44px, o'rindiqlar 26px radiusda —
    stolga TEGIB turadi, uzoqda uchmaydi */
-html.kio-ui .wt-card--mini .wt-card__plan { padding: 2px 0 7px; }
-html.kio-ui .wt-card--mini .wt-card__seats {
+html.kio-ui .wt-card--mini .wt-card__plan,
+html.wt-ui .wt-card--mini .wt-card__plan { padding: 2px 0 7px; }
+html.kio-ui .wt-card--mini .wt-card__seats,
+html.wt-ui .wt-card--mini .wt-card__seats {
   width: 62px; height: 62px;
   --seat-r: 26px;
 }
-html.kio-ui .wt-card--mini .wt-card__disc {
+html.kio-ui .wt-card--mini .wt-card__disc,
+html.wt-ui .wt-card--mini .wt-card__disc {
   inset: 9px;
   font-size: 15px; font-weight: 700;
   border-width: 2px;
   box-shadow: none;
 }
-html.kio-ui .wt-card--mini .wt-seat {
+html.kio-ui .wt-card--mini .wt-seat,
+html.wt-ui .wt-card--mini .wt-seat {
   width: 8px; height: 9px;
   margin: -4.5px 0 0 -4px;
   border-radius: 3px 3px 2px 2px;
   box-shadow: none;
 }
-html.kio-ui .wt-card--mini .wt-seat.is-taken {
+html.kio-ui .wt-card--mini .wt-seat.is-taken,
+html.wt-ui .wt-card--mini .wt-seat.is-taken {
   background: var(--c);
   box-shadow: none;
 }
 
-html.kio-ui .wt-mini__name {
+html.kio-ui .wt-mini__name,
+html.wt-ui .wt-mini__name {
   text-align: center;
   font-size: 12px; font-weight: 600;
   color: var(--di-ink);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
-html.kio-ui .wt-mini__row {
+html.kio-ui .wt-mini__row,
+html.wt-ui .wt-mini__row {
   display: flex; align-items: center; justify-content: center;
   gap: 8px; margin-top: 3px;
   color: var(--di-muted);
   font-size: 10.5px;
   font-variant-numeric: tabular-nums;
 }
-html.kio-ui .wt-mini__row span {
+html.kio-ui .wt-mini__row span,
+html.wt-ui .wt-mini__row span {
   display: inline-flex; align-items: center; gap: 2.5px;
 }
 
-html.kio-ui .wt-mini__sum {
+html.kio-ui .wt-mini__sum,
+html.wt-ui .wt-mini__sum {
   margin-top: 4px;
   text-align: center;
   font-size: 11.5px; font-weight: 700;
@@ -2415,9 +2443,12 @@ html.kio-ui .wt-mini__sum {
 }
 
 /* Tepadagi jamlanma ham ixchamroq */
-html.kio-ui .wt-stat { padding: 8px 10px; }
-html.kio-ui .wt-stat__body b { font-size: 15px; }
-html.kio-ui .wt-stat__dot { width: 26px; height: 26px; }
+html.kio-ui .wt-stat,
+html.wt-ui .wt-stat { padding: 8px 10px; }
+html.kio-ui .wt-stat__body b,
+html.wt-ui .wt-stat__body b { font-size: 15px; }
+html.kio-ui .wt-stat__dot,
+html.wt-ui .wt-stat__dot { width: 26px; height: 26px; }
 
 /* Planshet va kompyuterda ustunlar ko'payadi — bir ekranda
    butun zal ko'rinadi, aylantirish kerak bo'lmaydi */
@@ -2434,10 +2465,14 @@ html.kio-ui .wt-stat__dot { width: 26px; height: 26px; }
 }
 
 /* Bo'sh joyni yeydigan tashqi hoshiyalar qisqartirildi */
-html.kio-ui .di-list { padding-left: 10px; padding-right: 10px; }
-html.kio-ui .wt-toolbar { padding-left: 10px; padding-right: 10px; }
-html.kio-ui .wt-stats { padding-left: 10px; padding-right: 10px; }
-html.kio-ui .di-header { padding-top: calc(9px + env(safe-area-inset-top, 0px)); padding-bottom: 9px; }
+html.kio-ui .di-list,
+html.wt-ui .di-list { padding-left: 10px; padding-right: 10px; }
+html.kio-ui .wt-toolbar,
+html.wt-ui .wt-toolbar { padding-left: 10px; padding-right: 10px; }
+html.kio-ui .wt-stats,
+html.wt-ui .wt-stats { padding-left: 10px; padding-right: 10px; }
+html.kio-ui .di-header,
+html.wt-ui .di-header { padding-top: calc(9px + env(safe-area-inset-top, 0px)); padding-bottom: 9px; }
 
 /* ══════════════════════════════════════════════════════
    MEHMON SONI va TEKSHIRISH PANELI
@@ -2635,3 +2670,104 @@ html.kio-ui .di-header { padding-top: calc(9px + env(safe-area-inset-top, 0px));
   font-size: 16px; font-weight: 650;
 }
 .wt-review__send:disabled { opacity: 0.6; }
+
+/* ══════════════════════════════════════════════════════
+   OFITSIANT KIRISHI — oq, sodda
+
+   Login sahifasi qora gradient va backdrop-filter bilan edi.
+   Ikki muammo:
+     1. Qolgan ilova oq, kirish qora — bir tizimga o'xshamasdi
+     2. backdrop-filter arzon telefonlarda kompozitorni
+        yuklaydi, ochilish sekinlashadi
+
+   Endi: tekis fon, soya yo'q, faqat nozik chiziq. Ekranda
+   uchta narsa qoladi — belgi, ikki maydon, tugma.
+   ══════════════════════════════════════════════════════ */
+
+html.wt-ui .wt-page {
+  background: var(--di-bg);
+  padding: 24px 20px;
+  align-items: flex-start;
+  padding-top: max(64px, 12dvh);
+}
+
+html.wt-ui .wt-card {
+  max-width: 360px;
+  padding: 28px 22px 26px;
+  border-radius: 22px;
+  background: var(--di-surface);
+  border: 1px solid var(--di-line);
+  /* backdrop-filter OLIB TASHLANDI — ortida blur qiladigan
+     narsa yo'q, faqat quvvat sarflardi */
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: 0 1px 2px rgba(28, 22, 16, 0.04);
+}
+
+html.wt-ui .wt-logo { margin-bottom: 22px; }
+
+html.wt-ui .wt-logo-icon {
+  width: 58px; height: 58px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #F0A93C, #D9860F);
+  box-shadow: 0 6px 16px rgba(201, 122, 18, 0.22);
+}
+
+html.wt-ui .wt-logo h1 {
+  color: var(--di-ink);
+  font-size: 21px;
+  margin-top: 12px;
+}
+html.wt-ui .wt-logo span { color: var(--di-muted); }
+
+html.wt-ui .wt-header { margin-bottom: 18px; }
+html.wt-ui .wt-header h2 {
+  color: var(--di-ink);
+  font-size: 17px;
+}
+html.wt-ui .wt-header p { color: var(--di-muted); }
+
+/* Maydonlar — katta nishon, iOS masshtablanmasin */
+html.wt-ui .wt-field input,
+html.wt-ui .wt-input,
+html.wt-ui input[type="text"],
+html.wt-ui input[type="password"] {
+  background: var(--di-surface-2);
+  border: 1px solid var(--di-line);
+  color: var(--di-ink);
+  /* 16px dan kichik bo'lsa iOS fokusda ekranni kattalashtiradi
+     va foydalanuvchi qo'lda qaytarishga majbur bo'ladi */
+  font-size: 16px;
+  min-height: 50px;
+}
+html.wt-ui input::placeholder { color: var(--di-muted); }
+
+html.wt-ui .wt-field input:focus,
+html.wt-ui .wt-input:focus {
+  border-color: var(--di-brand);
+  outline: none;
+}
+
+html.wt-ui .wt-submit {
+  min-height: 52px;
+  border-radius: 15px;
+  background: var(--di-brand);
+  color: var(--di-brand-text);
+  font-size: 16px; font-weight: 650;
+  box-shadow: none;
+}
+html.wt-ui .wt-submit:active:not(:disabled) { transform: scale(0.985); }
+html.wt-ui .wt-submit:disabled { opacity: 0.55; }
+
+html.wt-ui .wt-error {
+  background: rgba(201, 59, 49, 0.09);
+  border: 1px solid rgba(201, 59, 49, 0.25);
+  color: var(--di-danger);
+}
+
+/* Ofitsiant sarlavhasidagi "Chiqish" */
+html.wt-ui .wt-logout {
+  background: var(--di-tint);
+  color: var(--di-muted);
+  border: 1px solid var(--di-line);
+}

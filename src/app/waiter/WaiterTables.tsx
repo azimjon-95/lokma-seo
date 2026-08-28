@@ -654,7 +654,7 @@ function GuestCountSheet({
           </div>
           <button
             onClick={() => setCount((n) => Math.min(30, n + 1))}
-            aria-label="Ko\u2018paytirish"
+            aria-label="Ko‘paytirish"
           >+</button>
         </div>
 
@@ -670,7 +670,7 @@ function GuestCountSheet({
 
         {over && (
           <p className="wt-guest__warn">
-            Sig\u2018imdan {count - capacity} kishi ko\u2018p — stul qo\u2018shish kerak
+            Sig‘imdan {count - capacity} kishi ko‘p — stul qo‘shish kerak
           </p>
         )}
 
@@ -753,7 +753,7 @@ function ReviewSheet({
             <div className="wt-review__title">Buyurtmani tekshiring</div>
             <div className="wt-review__sub">
               {lines.reduce((n, l) => n + l.quantity, 0)} ta taom
-              {courses.length > 1 && ` \u00b7 ${courses.length} kurs`}
+              {courses.length > 1 && ` · ${courses.length} kurs`}
             </div>
           </div>
           <button onClick={onClose} className="di-sheet__close" aria-label="Yopish">✕</button>
@@ -780,7 +780,7 @@ function ReviewSheet({
                     <div className="di-qty di-qty--sm">
                       <button onClick={() => onQty(l.key, l.quantity - 1)} aria-label="Kamaytirish">−</button>
                       <span>{l.quantity}</span>
-                      <button onClick={() => onQty(l.key, l.quantity + 1)} aria-label="Ko\u2018paytirish">+</button>
+                      <button onClick={() => onQty(l.key, l.quantity + 1)} aria-label="Ko‘paytirish">+</button>
                     </div>
                   </div>
 
@@ -797,7 +797,7 @@ function ReviewSheet({
                       onClick={() => setEditing(editing === l.key ? null : l.key)}
                       className={`wt-tool ${l.note ? "is-on" : ""}`}
                     >
-                      {l.note ? "Izohni o\u2018zgartirish" : "Izoh"}
+                      {l.note ? "Izohni o‘zgartirish" : "Izoh"}
                     </button>
 
                     <button
@@ -847,13 +847,13 @@ function ReviewSheet({
         <footer className="wt-review__foot">
           <div className="wt-review__total">
             <span>Jami</span>
-            <b>{som(subtotal)} so\u2018m</b>
+            <b>{som(subtotal)}</b>
           </div>
 
           {courses.length > 1 && (
             <p className="wt-review__hint">
               Oshxonaga hozir faqat {COURSE_LABEL[courses[0]] || "1-kurs"} yuboriladi.
-              Qolganlari tayyor bo\u2018lganda siz yuborasiz.
+              Qolganlari tayyor bo‘lganda siz yuborasiz.
             </p>
           )}
 
