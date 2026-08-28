@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { waiterApi, type WaiterTable, ApiError } from "@/lib/dinein/api";
+import { waiterApi, type WaiterTable, type DineInOrder, ApiError } from "@/lib/dinein/api";
 import { som } from "@/lib/dinein/format";
 
 const STATUS: Record<string, { label: string; next?: string; nextLabel?: string }> = {
@@ -27,6 +27,7 @@ export function TableSheet({
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [guests, setGuests] = useState(table.guestCount || 0);
+
 
   const load = useCallback(async () => {
     try {
@@ -63,6 +64,27 @@ export function TableSheet({
     setBusy(true);
     try {
       await waiterApi.setOrderStatus(orderId, status);
+      await load();
+      onRefresh();
+    } catch (e) {
+      alert((e as ApiError).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  /**
+   * Keyingi kursni oshxonaga otish.
+   *
+   * Buyurtma ALLAQACHON oshxonada — bu faqat "endi shu kursni
+   * tayyorlashni boshlang" signali. Shuning uchun buyurtma
+   * holati o'zgarmaydi, faqat firedCourses to'ldiriladi.
+   */
+  const fire = async (orderId: string, course: number) => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await waiterApi.fireCourse(orderId, course);
       await load();
       onRefresh();
     } catch (e) {
@@ -144,28 +166,29 @@ export function TableSheet({
                     <span className="ts-order__status">{st.label}</span>
                   </div>
 
-                  <div className="ts-order__items">
-                    {o.items.map((it, i) => (
-                      <div key={i} className="ts-order__item">
-                        <span>{it.name} ×{it.quantity}</span>
-                        <span>{som(it.unitPrice * it.quantity)}</span>
-                      </div>
-                    ))}
-                  </div>
+                  <OrderCourses
+                    order={o}
+                    busy={busy}
+                    onFire={(course) => fire(o._id, course)}
+                  />
 
                   {o.note && <div className="ts-order__note">{o.note}</div>}
 
+                  {/*
+                    Umumiy "Oshxonaga" tugmasi OLIB TASHLANDI.
+
+                    Buyurtma yuborilganda BUTUNLAY oshxonaga
+                    boradi — oshxona hamma taomni ko'radi. Faqat
+                    1-kurs tayyorlanadi, qolganlari "keyinroq"
+                    bo'lib turadi va har biri O'Z tugmasi bilan
+                    otiladi (yuqorida, kurs sarlavhasi yonida).
+
+                    Bitta umumiy tugma bu mantiqni buzardi:
+                    ofitsiant uni bosса hamma kurs birdan
+                    tayyorlana boshlardi va taom sovib qolardi.
+                  */}
                   <div className="ts-order__foot">
                     <b>{som(o.total)}</b>
-                    {st.next && (
-                      <button
-                        onClick={() => advance(o._id, st.next!)}
-                        disabled={busy}
-                        className="ts-order__btn"
-                      >
-                        {st.nextLabel}
-                      </button>
-                    )}
                   </div>
                 </div>
               );
@@ -206,6 +229,79 @@ export function TableSheet({
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BUYURTMA TAOMLARI — kurslar bo'yicha
+
+   Kurs bittagina bo'lsa sarlavha chizilmaydi: ortiqcha
+   qatlam ekranni band qiladi va hech narsa qo'shmaydi.
+
+   Otilmagan kurs xiralashgan bo'lib turadi va yonida
+   "Tayyorlash" tugmasi bo'ladi. Otilgach tugma yo'qoladi —
+   ikki marta otishning ma'nosi yo'q.
+   ═══════════════════════════════════════════════════════════ */
+function OrderCourses({
+  order, busy, onFire,
+}: {
+  order: DineInOrder & { note?: string };
+  busy: boolean;
+  onFire: (course: number) => void;
+}) {
+  const fired = order.firedCourses?.length ? order.firedCourses : [1];
+  const closed = ["cancelled", "completed"].includes(order.status);
+
+  // Kurs bo'yicha guruhlash. Eski buyurtmalarda `course` yo'q —
+  // ular 1-kursga tushadi va hech narsa buzilmaydi.
+  const groups = new Map<number, typeof order.items>();
+  for (const it of order.items) {
+    const c = it.course || 1;
+    if (!groups.has(c)) groups.set(c, []);
+    groups.get(c)!.push(it);
+  }
+  const courses = [...groups.keys()].sort((a, b) => a - b);
+  const multi = courses.length > 1;
+
+  return (
+    <div className="ts-order__items">
+      {courses.map((c) => {
+        const isFired = fired.includes(c);
+        return (
+          <div key={c} className={`ts-course ${!isFired ? "is-waiting" : ""}`}>
+            {multi && (
+              <div className="ts-course__head">
+                <span className="ts-course__label">
+                  {c}-kurs
+                  {!isFired && <i>keyinroq</i>}
+                </span>
+
+                {!isFired && !closed && (
+                  <button
+                    onClick={() => onFire(c)}
+                    disabled={busy}
+                    className="ts-course__fire"
+                  >
+                    Tayyorlash
+                  </button>
+                )}
+              </div>
+            )}
+
+            {groups.get(c)!.map((it, i) => (
+              <div key={i} className="ts-order__item">
+                <span>
+                  {it.name} ×{it.quantity}
+                  {it.takeaway && <em className="ts-tag">olib ketish</em>}
+                  {it.note && <small className="ts-note">✎ {it.note}</small>}
+                </span>
+                <span>{som(it.unitPrice * it.quantity)}</span>
+              </div>
+            ))}
+          </div>
+        );
+      })}
     </div>
   );
 }

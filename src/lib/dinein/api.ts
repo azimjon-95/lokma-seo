@@ -111,6 +111,11 @@ export interface OrderItem {
   unitPrice: number;
   selectedOptions?: DishOption[];
   note?: string;
+
+  /** Podacha: 1 = darhol, 2+ = keyinroq */
+  course?: number;
+  /** Shu taom olib ketiladimi */
+  takeaway?: boolean;
 }
 
 export interface DineInOrder {
@@ -122,6 +127,8 @@ export interface DineInOrder {
   total: number;
   status: string;
   orderSource: "qr" | "waiter";
+  /** Oshxonada tayyorlanishi boshlangan kurslar */
+  firedCourses?: number[];
   promotionName?: string;
   promotionDiscount?: number;
   bonusUsed?: number;

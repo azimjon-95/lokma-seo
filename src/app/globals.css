@@ -2837,3 +2837,68 @@ html.wt-ui .wt-logout {
   .wt-guest__pick button { width: 48px; height: 48px; }
   .wt-guest__num b { font-size: 40px; }
 }
+
+/* ══════════════════════════════════════════════════════
+   STOL VARAG'IDA KURSLAR
+
+   Otilmagan kurs xiralashgan bo'lib turadi — ofitsiant
+   bir qarashda nima tayyorlanayotganini va nima kutayotganini
+   ajratadi. Tugma faqat otilmagan kursda chiqadi: otilganini
+   qayta otishning ma'nosi yo'q.
+   ══════════════════════════════════════════════════════ */
+
+.ts-course + .ts-course {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--di-line);
+}
+
+.ts-course.is-waiting .ts-order__item {
+  opacity: 0.5;
+}
+
+.ts-course__head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.ts-course__label {
+  display: flex; align-items: baseline; gap: 7px;
+  font-size: 12.5px; font-weight: 700;
+  color: var(--di-brand);
+}
+.ts-course__label i {
+  font-style: normal; font-weight: 500;
+  font-size: 11.5px;
+  color: var(--di-muted);
+}
+
+/* Tugma kichik, lekin barmoq nishoni yetarli (36px) */
+.ts-course__fire {
+  flex: none;
+  min-height: 34px;
+  padding: 0 13px;
+  border-radius: 10px;
+  background: var(--di-brand);
+  color: var(--di-brand-text);
+  font-size: 12.5px; font-weight: 700;
+}
+.ts-course__fire:active:not(:disabled) { transform: scale(0.96); }
+.ts-course__fire:disabled { opacity: 0.5; }
+
+/* Taom yonidagi belgilar */
+.ts-tag {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.16);
+  color: #3B82F6;
+  font-size: 10px; font-weight: 600; font-style: normal;
+}
+.ts-note {
+  display: block;
+  margin-top: 2px;
+  color: var(--di-brand);
+  font-size: 11.5px;
+}

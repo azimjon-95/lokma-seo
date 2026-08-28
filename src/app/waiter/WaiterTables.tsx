@@ -700,6 +700,15 @@ function GuestCountSheet({
 
 const COURSE_LABEL = ["", "1-kurs", "2-kurs", "3-kurs", "4-kurs", "5-kurs"];
 
+/*
+ * Tekshirish oynasidagi izoh matni ANIQLASHTIRILDI.
+ *
+ * Ilgari "Oshxonaga hozir faqat 1-kurs yuboriladi" deyilardi —
+ * bu noto'g'ri tasavvur berardi. Oshxona butun buyurtmani
+ * KO'RADI (nima kelishini oldindan bilishi kerak), faqat
+ * keyingi kurslarni tayyorlashni boshlamaydi.
+ */
+
 function ReviewSheet({
   lines, subtotal, sending, onClose, onPatch, onQty, onSubmit,
 }: {
@@ -852,8 +861,9 @@ function ReviewSheet({
 
           {courses.length > 1 && (
             <p className="wt-review__hint">
-              Oshxonaga hozir faqat {COURSE_LABEL[courses[0]] || "1-kurs"} yuboriladi.
-              Qolganlari tayyor bo‘lganda siz yuborasiz.
+              Oshxona butun buyurtmani ko‘radi, lekin hozir faqat{" "}
+              {COURSE_LABEL[courses[0]] || "1-kurs"} tayyorlanadi.
+              Qolganlarini stol varag‘idan siz yuborasiz.
             </p>
           )}
 
